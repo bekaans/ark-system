@@ -75,7 +75,12 @@ ihtiyaç doğarsa bakiye yüklenecek.
 - [x] 7. GitHub mono-repo `ark-system` — private repo, ama klasör yapısı plandaki `/agents /skills /template /chatbot` değil, `/litellm /bexi-app /supabase` oldu
 - [x] 8. Geliştirme ortamı: Superpowers (resmi marketplace), claude-mem (thedotmack/claude-mem), find-skills (vercel-labs/skills) kuruldu — hafıza testi ("oturum kapat-aç") ancak gerçek yeni bir oturumda doğrulanabilir, henüz yapılmadı
 
-**S0 tamamlandı sayılır** (1-4 hariç — bunlar marka/iş kararları, kullanıcı yapmalı). **Sonraki sprint: S1 — Ajan 1 Lead Makinesi** henüz başlanmadı.
+**S0 tamamlandı sayılır** (1-4 hariç — bunlar marka/iş kararları, kullanıcı yapmalı).
+
+**S1 — Ajan 1: Lead Makinesi** (Hafta 2-3)
+- [x] 9. NACE taksonomisini yükle + filtrele — `colaberry/WorldOfTaxonomy` reposu klonlandı (`agents/WorldOfTaxonomy/`, .gitignore'da), bundled `tree-data/nace_rev2.json`'dan 360 aday sınıf okundu, Ajan 1 LLM zinciriyle (Cerebras) filtrelendi, **23 sektör** `sectors` tablosuna yazıldı (`agents/ajan1/filter_nace.py`). İlk modelin yanlış işaretlediği 6 üretim/imalat sınıfı (giyim/ayakkabı/elektronik üretimi, reklamcılık) elle çıkarıldı.
+- [ ] 10. Sektörleri veriyle puanla, ilk 20'yi seç — **CPC adımı ertelendi** (Google Ads Basic Access sitesiz reddedilebiliyordu + gerçek reklam harcaması olmadan sadece kaba aralık veriyor); dijital gerilik oranı + işletme hacmiyle ilerlenecek
+- [ ] 11-16. Toplayıcı, site denetçisi, lead puanlama, outreach taslakları, gecelik cron, ilk mesajlar — henüz başlanmadı
 
 **Ek/genişletilmiş kapsam (plan dışı ama konuşulan):**
 - [x] `bexi-app/` Next.js PWA iskeleti (henüz sohbet arayüzü/API route yazılmadı, plan mission-control öneriyordu — henüz karşılaştırılmadı)
