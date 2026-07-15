@@ -71,7 +71,7 @@ ihtiyaç doğarsa bakiye yüklenecek.
 - [ ] 3. Instagram + LinkedIn hesapları — yapılmadı
 - [ ] 4. Google Workspace kurumsal mail — yapılmadı
 - [x] 5. Supabase projesi + 5 tablo (sectors, businesses, audits, leads, conversations) — kuruldu, RLS aktif, `supabase/schema.sql`
-- [x] 6. API anahtarları — Cerebras/Groq/Gemini/OpenRouter/Anthropic `.env`'de; Google Ads MCC henüz açılmadı
+- [~] 6. API anahtarları — Cerebras/Groq/Gemini/OpenRouter/Anthropic `.env`'de. Google Ads: MCC hesabı + developer token (Test seviyesi) alındı, ama **Basic Access başvurusu ertelendi** — şirket web sitesi olmadan (`madde 1` bekliyor) Google başvuruyu reddedebiliyor, ayrıca gerçek reklam harcaması olmadan sadece kaba aralık verisi (ör. "1K-10K") dönüyor. Karar: domain alınana kadar bekletiliyor; sektör puanlamasında CPC şimdilik atlanıp diğer sinyallerle (dijital gerilik oranı, işletme hacmi) ilerlenecek, CPC sonradan haftalık kalibrasyona eklenir.
 - [x] 7. GitHub mono-repo `ark-system` — private repo, ama klasör yapısı plandaki `/agents /skills /template /chatbot` değil, `/litellm /bexi-app /supabase` oldu
 - [x] 8. Geliştirme ortamı: Superpowers (resmi marketplace), claude-mem (thedotmack/claude-mem), find-skills (vercel-labs/skills) kuruldu — hafıza testi ("oturum kapat-aç") ancak gerçek yeni bir oturumda doğrulanabilir, henüz yapılmadı
 
