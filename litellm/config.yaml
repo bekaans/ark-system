@@ -43,16 +43,16 @@ model_list:
       model: openrouter/nvidia/nemotron-3-ultra:free
       api_key: os.environ/OPENROUTER_API_KEY
 
-  # --- Jarvis: yonetici/sohbet asistani (dusuk hacim, sen soruyorsun) ---
-  - model_name: jarvis-deepseek
+  # --- Bexi: yonetici/sohbet asistani (dusuk hacim, sen soruyorsun) ---
+  - model_name: bexi-deepseek
     litellm_params:
       model: openrouter/deepseek/deepseek-v4-pro
       api_key: os.environ/OPENROUTER_API_KEY
-  - model_name: jarvis-groq
+  - model_name: bexi-groq
     litellm_params:
       model: groq/llama-3.3-70b-versatile
       api_key: os.environ/GROQ_API_KEY
-  - model_name: jarvis-gemini
+  - model_name: bexi-gemini
     litellm_params:
       model: gemini/gemini-3.1-flash
       api_key: os.environ/GEMINI_API_KEY
@@ -63,7 +63,7 @@ router_settings:
     - ajan1-cerebras: ["ajan1-gemini", "ajan1-openrouter"]
     - dmq-groq: ["dmq-gemini", "dmq-openrouter"]
     - ajan2-gemini: ["ajan2-openrouter"]
-    - jarvis-deepseek: ["jarvis-groq", "jarvis-gemini"]   # OpenRouter bakiyesi biterse ucretsize duser
+    - bexi-deepseek: ["bexi-groq", "bexi-gemini"]   # OpenRouter bakiyesi biterse ucretsize duser
   num_retries: 2
   timeout: 30
   cooldown_time: 60          # rate-limitlenen provider 60sn devre disi kalir
