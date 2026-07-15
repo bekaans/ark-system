@@ -73,9 +73,9 @@ ihtiyaç doğarsa bakiye yüklenecek.
 - [x] 5. Supabase projesi + 5 tablo (sectors, businesses, audits, leads, conversations) — kuruldu, RLS aktif, `supabase/schema.sql`
 - [x] 6. API anahtarları — Cerebras/Groq/Gemini/OpenRouter/Anthropic `.env`'de; Google Ads MCC henüz açılmadı
 - [x] 7. GitHub mono-repo `ark-system` — private repo, ama klasör yapısı plandaki `/agents /skills /template /chatbot` değil, `/litellm /bexi-app /supabase` oldu
-- [ ] 8. Geliştirme ortamı: Claude Code kurulu ama **Superpowers, claude-mem, find-skills henüz kurulmadı**
+- [x] 8. Geliştirme ortamı: Superpowers (resmi marketplace), claude-mem (thedotmack/claude-mem), find-skills (vercel-labs/skills) kuruldu — hafıza testi ("oturum kapat-aç") ancak gerçek yeni bir oturumda doğrulanabilir, henüz yapılmadı
 
-**Sonraki sprintler:** henüz başlanmadı (S1 lead makinesi, S2 şablon, S3 bot/CRM, S4 tam otomasyon)
+**S0 tamamlandı sayılır** (1-4 hariç — bunlar marka/iş kararları, kullanıcı yapmalı). **Sonraki sprint: S1 — Ajan 1 Lead Makinesi** henüz başlanmadı.
 
 **Ek/genişletilmiş kapsam (plan dışı ama konuşulan):**
 - [x] `bexi-app/` Next.js PWA iskeleti (henüz sohbet arayüzü/API route yazılmadı, plan mission-control öneriyordu — henüz karşılaştırılmadı)
