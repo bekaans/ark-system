@@ -2,7 +2,7 @@ model_list:
   # --- Ajan 1: NACE filtre + lead skorlama (yüksek hacim) ---
   - model_name: ajan1-cerebras
     litellm_params:
-      model: cerebras/llama3.3-70b
+      model: cerebras/gpt-oss-120b
       api_key: os.environ/CEREBRAS_API_KEY
   - model_name: ajan1-gemini
     litellm_params:
