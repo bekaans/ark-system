@@ -79,8 +79,11 @@ ihtiyaç doğarsa bakiye yüklenecek.
 
 **S1 — Ajan 1: Lead Makinesi** (Hafta 2-3)
 - [x] 9. NACE taksonomisini yükle + filtrele — `colaberry/WorldOfTaxonomy` reposu klonlandı (`agents/WorldOfTaxonomy/`, .gitignore'da), bundled `tree-data/nace_rev2.json`'dan 360 aday sınıf okundu, Ajan 1 LLM zinciriyle (Cerebras) filtrelendi, **23 sektör** `sectors` tablosuna yazıldı (`agents/ajan1/filter_nace.py`). İlk modelin yanlış işaretlediği 6 üretim/imalat sınıfı (giyim/ayakkabı/elektronik üretimi, reklamcılık) elle çıkarıldı.
-- [ ] 10. Sektörleri veriyle puanla, ilk 20'yi seç — **CPC adımı ertelendi** (Google Ads Basic Access sitesiz reddedilebiliyordu + gerçek reklam harcaması olmadan sadece kaba aralık veriyor); dijital gerilik oranı + işletme hacmiyle ilerlenecek
-- [ ] 11-16. Toplayıcı, site denetçisi, lead puanlama, outreach taslakları, gecelik cron, ilk mesajlar — henüz başlanmadı
+- [~] 10. Sektörleri veriyle puanla — **CPC adımı ertelendi** (Google Ads Basic Access sitesiz reddedilebiliyordu + gerçek reklam harcaması olmadan sadece kaba aralık veriyor). İşletme hacmi tamamlandı: `gosom/google-maps-scraper` (Go'dan derlendi, `agents/google-maps-scraper/`, .gitignore'da) ile 23 sektör × 5 şehir (İstanbul, Ankara, İzmir, Bursa, Antalya) = 115 sorgu tarandı, **2.195 tekil işletme** bulundu, her sektörün `business_volume`'u `sectors` tablosuna yazıldı (`agents/ajan1/import_businesses.py`). Dijital gerilik oranı (site denetimi, madde 12) henüz yok — ilk 20 seçimi ondan sonra netleşecek.
+- [x] 11. Toplayıcı — yukarıdaki taramayla fiilen tamamlandı, işletmeler `businesses` tablosunda (place_id ile mükerrer engellendi).
+- [ ] 12-16. Site denetçisi, lead puanlama, outreach taslakları, sürekli-çalışan döngü (gecelik değil, "açık olduğu sürece" - kullanıcı tercihi), ilk mesajlar — henüz başlanmadı
+
+**Not:** Bu adımlar şu an **ben (Claude Code) tarafından elle çalıştırılıyor** — Ajan 1 henüz bağımsız/otomatik çalışmıyor. Madde 15'te (adı değişecek: "sürekli döngü") bu script'ler bir servise bağlanınca gerçek anlamda "Ajan 1 çalışıyor" denebilecek.
 
 **Ek/genişletilmiş kapsam (plan dışı ama konuşulan):**
 - [x] `bexi-app/` Next.js PWA iskeleti (henüz sohbet arayüzü/API route yazılmadı, plan mission-control öneriyordu — henüz karşılaştırılmadı)

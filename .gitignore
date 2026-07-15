@@ -7,3 +7,5 @@ __pycache__/
 .DS_Store
 node_modules/
 agents/WorldOfTaxonomy/
+agents/google-maps-scraper/
+agents/ajan1/data/
