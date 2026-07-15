@@ -1,0 +1,59 @@
+model_list:
+  # --- Ajan 1: NACE filtre + lead skorlama (yüksek hacim) ---
+  - model_name: ajan1-cerebras
+    litellm_params:
+      model: cerebras/llama3.3-70b
+      api_key: os.environ/CEREBRAS_API_KEY
+  - model_name: ajan1-gemini
+    litellm_params:
+      model: gemini/gemini-3.1-flash-lite
+      api_key: os.environ/GEMINI_API_KEY
+  - model_name: ajan1-openrouter
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-ultra:free
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  # --- dm-qualifier: Türkçe WhatsApp/IG bot (düşük gecikme) ---
+  - model_name: dmq-groq
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+  - model_name: dmq-gemini
+    litellm_params:
+      model: gemini/gemini-3.1-flash
+      api_key: os.environ/GEMINI_API_KEY
+  - model_name: dmq-openrouter
+    litellm_params:
+      model: openrouter/meta-llama/llama-3.3-70b-instruct:free
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  # --- Ajan 2: video -> prompt (multimodal) ---
+  - model_name: ajan2-gemini
+    litellm_params:
+      model: gemini/gemini-3.1-flash
+      api_key: os.environ/GEMINI_API_KEY
+  - model_name: ajan2-openrouter
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-nano-omni-30b:free
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  # --- Ajan 3: site-assembler orkestrasyon ---
+  - model_name: ajan3-openrouter
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-ultra:free
+      api_key: os.environ/OPENROUTER_API_KEY
+
+router_settings:
+  # Primary basarisiz olursa (rate limit / timeout / 5xx) sirayla denenir.
+  fallbacks:
+    - ajan1-cerebras: ["ajan1-gemini", "ajan1-openrouter"]
+    - dmq-groq: ["dmq-gemini", "dmq-openrouter"]
+    - ajan2-gemini: ["ajan2-openrouter"]
+  num_retries: 2
+  timeout: 30
+  cooldown_time: 60          # rate-limitlenen provider 60sn devre disi kalir
+  allowed_fails: 1           # 1 hatada devre disi birak, digerine gec
+
+litellm_settings:
+  drop_params: true          # provider'lar arasi desteklenmeyen parametreleri sessizce at
+  set_verbose: false
