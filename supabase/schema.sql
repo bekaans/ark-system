@@ -1,0 +1,85 @@
+-- ARK Intelligence - Supabase semasi
+-- Bu dosyayi Supabase SQL Editor'a yapistirip calistir.
+-- 5 tablo: sectors, businesses, audits, leads, conversations
+
+create extension if not exists "pgcrypto";
+
+-- 1) sectors: NACE tabanli sektor puanlama
+create table if not exists sectors (
+  id uuid primary key default gen_random_uuid(),
+  nace_code text not null,
+  name text not null,
+  opportunity_score numeric,
+  cpc numeric,
+  business_volume int,
+  digital_weakness_ratio numeric,
+  weight numeric default 1.0,       -- haftalik kalibrasyonla guncellenir (S4/40)
+  created_at timestamptz not null default now()
+);
+
+-- 2) businesses: toplanan isletmeler (Google Maps scraper)
+create table if not exists businesses (
+  id uuid primary key default gen_random_uuid(),
+  place_id text unique,              -- mukerrer kontrolu
+  sector_id uuid references sectors(id),
+  name text not null,
+  city text,
+  address text,
+  phone text,
+  website text,
+  created_at timestamptz not null default now()
+);
+
+-- 3) audits: site denetim sonuclari
+create table if not exists audits (
+  id uuid primary key default gen_random_uuid(),
+  business_id uuid references businesses(id) not null,
+  has_animation boolean default false,   -- GSAP/Three.js tespiti
+  has_meta_pixel boolean default false,
+  has_gtag boolean default false,
+  seo_score numeric,
+  lighthouse_score numeric,
+  screenshot_url text,
+  audited_at timestamptz not null default now()
+);
+
+-- 4) leads: skorlanmis lead'ler + tier
+create table if not exists leads (
+  id uuid primary key default gen_random_uuid(),
+  business_id uuid references businesses(id) not null,
+  sector_id uuid references sectors(id),
+  lead_score numeric,
+  tier text check (tier in ('A', 'B', 'C')),
+  estimated_deal_value numeric,
+  status text not null default 'new'
+    check (status in ('new','contacted','qualified','meeting','proposal','won','lost')),
+  outreach_draft text,
+  created_at timestamptz not null default now()
+);
+
+-- 5) conversations: dm-qualifier mesaj gecmisi + token yakalama
+create table if not exists conversations (
+  id uuid primary key default gen_random_uuid(),
+  lead_id uuid references leads(id) not null,
+  channel text check (channel in ('whatsapp','instagram')),
+  direction text check (direction in ('inbound','outbound')),
+  message text,
+  token text check (token in ('APPOINTMENT','HUMAN', null)),
+  created_at timestamptz not null default now()
+);
+
+-- Indeksler (siklikla sorgulanacak alanlar)
+create index if not exists idx_businesses_sector on businesses(sector_id);
+create index if not exists idx_audits_business on audits(business_id);
+create index if not exists idx_leads_business on leads(business_id);
+create index if not exists idx_leads_status on leads(status);
+create index if not exists idx_conversations_lead on conversations(lead_id);
+
+-- Row Level Security: varsayilan olarak KAPALI erisim.
+-- Backend ajanlari (server-side) service_role key ile RLS'i atlar - bu normal ve guvenlidir.
+-- Publishable/anon key ile hicbir client bu tablolara dogrudan erisemez (politika eklenmedikce).
+alter table sectors enable row level security;
+alter table businesses enable row level security;
+alter table audits enable row level security;
+alter table leads enable row level security;
+alter table conversations enable row level security;

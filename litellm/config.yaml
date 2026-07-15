@@ -10,7 +10,7 @@ model_list:
       api_key: os.environ/GEMINI_API_KEY
   - model_name: ajan1-openrouter
     litellm_params:
-      model: openrouter/nvidia/nemotron-3-ultra:free
+      model: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
       api_key: os.environ/OPENROUTER_API_KEY
 
   # --- dm-qualifier: Türkçe WhatsApp/IG bot (düşük gecikme) ---
@@ -26,6 +26,10 @@ model_list:
     litellm_params:
       model: openrouter/meta-llama/llama-3.3-70b-instruct:free
       api_key: os.environ/OPENROUTER_API_KEY
+  - model_name: dmq-claude
+    litellm_params:
+      model: anthropic/claude-haiku-4-5-20251001
+      api_key: os.environ/ANTHROPIC_API_KEY
 
   # --- Ajan 2: video -> prompt (multimodal) ---
   - model_name: ajan2-gemini
@@ -34,13 +38,13 @@ model_list:
       api_key: os.environ/GEMINI_API_KEY
   - model_name: ajan2-openrouter
     litellm_params:
-      model: openrouter/nvidia/nemotron-3-nano-omni-30b:free
+      model: openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free
       api_key: os.environ/OPENROUTER_API_KEY
 
   # --- Ajan 3: site-assembler orkestrasyon ---
   - model_name: ajan3-openrouter
     litellm_params:
-      model: openrouter/nvidia/nemotron-3-ultra:free
+      model: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
       api_key: os.environ/OPENROUTER_API_KEY
 
   # --- Bexi: yonetici/sohbet asistani (dusuk hacim, sen soruyorsun) ---
@@ -56,14 +60,20 @@ model_list:
     litellm_params:
       model: gemini/gemini-flash-latest
       api_key: os.environ/GEMINI_API_KEY
+  - model_name: bexi-claude
+    litellm_params:
+      model: anthropic/claude-haiku-4-5-20251001
+      api_key: os.environ/ANTHROPIC_API_KEY
 
 router_settings:
   # Primary basarisiz olursa (rate limit / timeout / 5xx) sirayla denenir.
+  # Claude (Anthropic) her iki zincirde de son-care: plandaki "Claude API = beyin"
+  # maddesini karsilar ama ucretsiz katmanlar tukenmeden devreye girmez.
   fallbacks:
     - ajan1-cerebras: ["ajan1-gemini", "ajan1-openrouter"]
-    - dmq-groq: ["dmq-gemini", "dmq-openrouter"]
+    - dmq-groq: ["dmq-gemini", "dmq-openrouter", "dmq-claude"]
     - ajan2-gemini: ["ajan2-openrouter"]
-    - bexi-deepseek: ["bexi-groq", "bexi-gemini"]   # OpenRouter bakiyesi biterse ucretsize duser
+    - bexi-deepseek: ["bexi-groq", "bexi-gemini", "bexi-claude"]
   num_retries: 2
   timeout: 30
   cooldown_time: 60          # rate-limitlenen provider 60sn devre disi kalir
