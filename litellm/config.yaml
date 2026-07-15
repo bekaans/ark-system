@@ -20,7 +20,7 @@ model_list:
       api_key: os.environ/GROQ_API_KEY
   - model_name: dmq-gemini
     litellm_params:
-      model: gemini/gemini-3.1-flash
+      model: gemini/gemini-flash-latest
       api_key: os.environ/GEMINI_API_KEY
   - model_name: dmq-openrouter
     litellm_params:
@@ -30,7 +30,7 @@ model_list:
   # --- Ajan 2: video -> prompt (multimodal) ---
   - model_name: ajan2-gemini
     litellm_params:
-      model: gemini/gemini-3.1-flash
+      model: gemini/gemini-flash-latest
       api_key: os.environ/GEMINI_API_KEY
   - model_name: ajan2-openrouter
     litellm_params:
@@ -54,7 +54,7 @@ model_list:
       api_key: os.environ/GROQ_API_KEY
   - model_name: bexi-gemini
     litellm_params:
-      model: gemini/gemini-3.1-flash
+      model: gemini/gemini-flash-latest
       api_key: os.environ/GEMINI_API_KEY
 
 router_settings:
