@@ -23,6 +23,10 @@ jobs:
         with:
           go-version: "1.26"
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Python bagimliliklarini kur
         run: |
           pip install python-dotenv supabase playwright requests
@@ -33,6 +37,19 @@ jobs:
           git clone --depth 1 https://github.com/gosom/google-maps-scraper agents/google-maps-scraper
           cd agents/google-maps-scraper
           go build -o google-maps-scraper .
+
+      - name: playwright-go driver icin CDN atlatma (bilinen upstream hata)
+        # playwright-go v0.6000.0, "1.60.0" surumunu playwright.azureedge.net'ten
+        # indirmeye calisiyor ama bu CDN olu + bu surum hicbir mirror'da yok
+        # (ayni sorun daha once yerelde de yasandi, cozum: gercek bir surumu
+        # 1.60.0 olarak etiketleyip npm registry'den (calisiyor) almak).
+        run: |
+          mkdir -p ~/.cache/ms-playwright-go/1.60.0
+          npm pack playwright-core@1.57.0 --silent
+          tar xzf playwright-core-1.57.0.tgz
+          sed -i 's/"version": "1.57.0"/"version": "1.60.0"/' package/package.json
+          cp -r package ~/.cache/ms-playwright-go/1.60.0/package
+          echo "PLAYWRIGHT_NODEJS_PATH=$(which node)" >> "$GITHUB_ENV"
 
       - name: Sonraki batch'i isle
         env:
