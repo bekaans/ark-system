@@ -109,18 +109,25 @@ def run_scraper(batch: list[dict]) -> tuple[Path, Path]:
     queries_path.write_text("\n".join(lines) + "\n")
 
     with open(log_path, "w") as log_f:
-        subprocess.run(
-            [
-                str(SCRAPER_BIN),
-                "-input", str(queries_path),
-                "-results", str(results_path),
-                "-exit-on-inactivity", "1m",  # sinirsiz calismaz - jobler bitip 1dk hareketsiz kalinca cikar
-            ],
-            stdout=log_f,
-            stderr=subprocess.STDOUT,
-            check=True,
-            timeout=600,
-        )
+        try:
+            subprocess.run(
+                [
+                    str(SCRAPER_BIN),
+                    "-input", str(queries_path),
+                    "-results", str(results_path),
+                    "-exit-on-inactivity", "1m",  # sinirsiz calismaz - jobler bitip 1dk hareketsiz kalinca cikar
+                ],
+                stdout=log_f,
+                stderr=subprocess.STDOUT,
+                check=True,
+                timeout=600,
+            )
+        except subprocess.CalledProcessError:
+            # CI'da log dosyasi calismadan sonra kayboluyor - hatayi hemen
+            # buraya bas ki Actions ciktisinda gorulebilsin.
+            print("[ARK] scraper basarisiz oldu, log:")
+            print(log_path.read_text()[-4000:])
+            raise
     return log_path, results_path
 
 
