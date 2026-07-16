@@ -76,7 +76,7 @@ kaldırıp gpt-oss-120b/zai-glm-4.7/gemma-4-31b'ye geçti, Gemini'de gemini-3.1-
 | Groq (`llama-3.3-70b-versatile`) | dmq/Bexi birincil | 1.000 istek/gün, düşük gecikme | ✅ test edildi |
 | Google AI Studio (Gemini) | Yedek katman (çoğu ajan) | 1.500 istek/gün/model | ⚠️ flash-lite ✅, tam flash geçici 503 verdi (Google tarafı) |
 | OpenRouter (çeşitli `:free`) | Son çare yedek | Hesap-bazlı paylaşımlı 50/gün (kredi yoksa) | ✅ Nemotron modelleri calisti, Llama 3.3 free rota gecici 429 (Venice saglayici, hesabimizla ilgisiz) |
-| OpenRouter (`deepseek/deepseek-v4-pro`) | Bexi birincil | Ücretli, ~$0.435/$0.87 per 1M token | ⏳ hesaba bakiye yüklenmedi, test edilmedi |
+| OpenRouter (`deepseek/deepseek-v4-pro`) | Bexi birincil | Ücretli, $0.435/$0.87 per 1M token (giriş/çıkış, 2026-07-16 canlı doğrulandı) | ✅ 2026-07-16: $5 bakiye yüklendi, test edildi (gerçek çağrı: 24 giriş + 65 çıkış token = $0.000067) |
 | Anthropic (`claude-haiku-4-5-20251001`) | dmq/Bexi **son çare** fallback | Ücretli | ⏳ key eklendi ama bilinçli olarak **bakiye yüklenmedi** — sadece 3 ücretsiz katman da çökerse tetiklenir, gereksiz yere para yatırılmadı |
 
 **Not:** Plandaki S0/6 maddesi Claude API'yi dm-qualifier ve Yönetici'nin "beyni" olarak
