@@ -3,7 +3,7 @@ name: "turkce-nlp-satis-hitabet"
 description: "dm-qualifier botunun (WhatsApp/Instagram) Turkce musteri sohbetlerinde kullanacagi ses/ton, hitap ve ikna kurallari. Yerel Turk isletme sahipleriyle yapilan ilk temas ve devam sohbetlerinde mesaj yazarken/gozden gecirirken kullan. 'dm-qualifier', 'musteri sohbeti', 'whatsapp mesaji', 'hitap', 'ikna', 'nlp', 'satis tier' gecen her yerde devreye gir. cold-email skill'inin uzerine kurulur ama o B2B soguk e-posta icindir - bu skill Turkce, gundelik, WhatsApp/Instagram DM sohbeti icindir."
 license: internal
 metadata:
-  version: 1.6.0
+  version: 1.7.0
   author: ARK Intelligence Labs
   category: sales-persona
   updated: 2026-07-16
@@ -41,14 +41,18 @@ ihtiyaca) gore secer - sabit bir script degil.
 ### 3D Web Sitesi
 Sektore gore ozellestirilmis, animasyonlu, ozel efektlerle tasarlanmis web sitesi.
 Musterinin kendi fotograf/urun gorseli GEREKMEZ. Daha hizli teslim edilir, daha
-erisilebilir bir fiyat noktasindadir.
+erisilebilir bir fiyat noktasindadir. **Fiyat: 12.000 TL** (2026-07-16, s3-9).
 
 ### 7D Web Sitesi
 3D'nin ustune, musterinin KENDI isletme ve urun fotograflarini isteyip bunlari
 animasyonlu siteye tasiyan premium katman. 7D'ye karar verildiginde bot bir
 sonraki adimda net ve kisa bir istekle fotograf/gorsel talep eder ("isletmenizin
 birkac fotografini, bir de urunlerinizin fotograflarini atarsaniz yeterli" gibi -
-uzun liste degil, Mesaj Bicimi kurallarina uygun kisa istek).
+uzun liste degil, Mesaj Bicimi kurallarina uygun kisa istek). **Fiyat: 24.000 TL**
+(2026-07-16, s3-9).
+
+**Yillik hosting-bakim paketi:** 3.000 TL/yil (her iki tier icin de) - statik
+site oldugu icin maliyet ~sifira yakin, saf marj.
 
 ### SEO 2.0
 Duz/generik SEO DEGIL. Sektore ve bolgeye ozel arama sorgularinda (orn.

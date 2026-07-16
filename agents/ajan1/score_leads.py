@@ -6,8 +6,10 @@ lead_score = zayiflik sinyali (sitesi yok/kotu = yuksek firsat) agirlikli
 + buyukluk sinyali (yorum sayisi = gercek/aktif isletme gostergesi).
 
 Esikler: 80+ Tier A, 60-79 Tier B, altinda Tier C.
-Tahmini anlasma degeri, madde 34'un fiyat kademeleri henuz yazilmadigi
-icin gecici/varsayilan degerlerle atanir (A=25000, B=15000, C=10000 TL).
+Tahmini anlasma degeri s3-9'daki gercek fiyat kademelerine gore (3D Web
+Sitesi 12.000 TL, 7D Web Sitesi 24.000 TL) tier basina KARISIK/beklenen
+deger olarak atanir - hangi musterinin 3D mi 7D mi alacagi konusma
+sirasinda belli oldugu icin bu bir tahmindir, kesin deger degil.
 """
 
 import os
@@ -19,7 +21,9 @@ from supabase import create_client
 ROOT = Path(__file__).parent.parent.parent
 load_dotenv(ROOT / "litellm" / ".env")
 
-DEFAULT_DEAL_VALUE = {"A": 25000, "B": 15000, "C": 10000}
+# Tier A: en yuksek firsatli isletmeler, 7D'ye (24k) daha yatkin beklenir.
+# Tier C: butce hassasiyeti daha yuksek, 3D'ye (12k) daha yatkin beklenir.
+DEFAULT_DEAL_VALUE = {"A": 24000, "B": 18000, "C": 12000}
 
 
 def tier_for(score: float) -> str:
