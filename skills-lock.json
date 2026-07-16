@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "cold-email": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "skillPath": "marketing-skill/skills/cold-email/SKILL.md",
+      "computedHash": "c0c8d7bb5a39875d7aa2e08c73705a8301c8e777976b19f149d9fdef05146295"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
