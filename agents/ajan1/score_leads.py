@@ -41,13 +41,26 @@ def main() -> None:
     top_sector_ids = [s["id"] for s in top_sectors]
     print(f"[ARK] {len(top_sector_ids)} sektordeki isletmeler degerlendirilecek.")
 
-    businesses = (
-        supabase.table("businesses")
-        .select("id,sector_id,website")
-        .in_("sector_id", top_sector_ids)
-        .execute()
-        .data
-    )
+    # PostgREST varsayilan olarak tek istekte en fazla 1000 satir donduruyor -
+    # .range() ile sayfalamadan tek .execute() cagirmak isletmeleri SESSIZCE
+    # kirpiyordu (2243 isletme varken sadece ilk 1000'i islenmisti). Simdi
+    # tumunu alana kadar sayfalayarak cekiyoruz.
+    businesses = []
+    page_size = 1000
+    offset = 0
+    while True:
+        page = (
+            supabase.table("businesses")
+            .select("id,sector_id,website")
+            .in_("sector_id", top_sector_ids)
+            .range(offset, offset + page_size - 1)
+            .execute()
+            .data
+        )
+        businesses.extend(page)
+        if len(page) < page_size:
+            break
+        offset += page_size
     print(f"[ARK] {len(businesses)} isletme bulundu.")
 
     # audits'i business_id -> audit eslemesi olarak yukle

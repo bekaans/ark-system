@@ -27,3 +27,11 @@ SECTOR_TERMS = {
 }
 
 CITIES = ["Istanbul", "Ankara", "Izmir", "Bursa", "Antalya"]
+
+# s1-7 "surekli-calisan dongu" kapsaminda zaman icinde eklenecek yeni sehirler.
+# run_next_batch.py bunlari CITIES'e degil, ayri bir listeye koyar ki ilk 5
+# sehirle ilgili gecmis is (scrape_progress'te 'done') bozulmasin.
+CITIES_EXPANSION = [
+    "Adana", "Gaziantep", "Konya", "Mersin", "Kayseri",
+    "Eskisehir", "Diyarbakir", "Samsun", "Denizli", "Sanliurfa",
+]

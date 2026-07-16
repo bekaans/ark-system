@@ -76,12 +76,24 @@ create table if not exists conversations (
   created_at timestamptz not null default now()
 );
 
+-- 6) scrape_progress: s1-7 surekli-calisan dongu - hangi (sektor,sehir) tarandi
+create table if not exists scrape_progress (
+  id uuid primary key default gen_random_uuid(),
+  sector_code text not null,
+  city text not null,
+  status text not null default 'pending' check (status in ('pending','done')),
+  scraped_at timestamptz,
+  created_at timestamptz not null default now(),
+  unique (sector_code, city)
+);
+
 -- Indeksler (siklikla sorgulanacak alanlar)
 create index if not exists idx_businesses_sector on businesses(sector_id);
 create index if not exists idx_audits_business on audits(business_id);
 create index if not exists idx_leads_business on leads(business_id);
 create index if not exists idx_leads_status on leads(status);
 create index if not exists idx_conversations_lead on conversations(lead_id);
+create index if not exists idx_scrape_progress_status on scrape_progress(status);
 
 -- Row Level Security: varsayilan olarak KAPALI erisim.
 -- Backend ajanlari (server-side) service_role key ile RLS'i atlar - bu normal ve guvenlidir.
@@ -91,3 +103,4 @@ alter table businesses enable row level security;
 alter table audits enable row level security;
 alter table leads enable row level security;
 alter table conversations enable row level security;
+alter table scrape_progress enable row level security;

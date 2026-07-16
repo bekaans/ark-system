@@ -1,0 +1,43 @@
+name: Ajan 1 - Surekli Dongu (s1-7)
+
+# "Gecelik" degil, "acik oldugu surece" (kullanici tercihi) - her 30 dakikada
+# bir kontrol eder, bekleyen (sektor,sehir) cifti varsa bir grubunu isler,
+# yoksa hizlica cikar. Manuel de tetiklenebilir (workflow_dispatch).
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - name: Python bagimliliklarini kur
+        run: |
+          pip install python-dotenv supabase playwright requests
+          playwright install --with-deps chromium
+
+      - name: google-maps-scraper'i klonla + derle (onaylanmis kaynak - gosom/google-maps-scraper)
+        run: |
+          git clone --depth 1 https://github.com/gosom/google-maps-scraper agents/google-maps-scraper
+          cd agents/google-maps-scraper
+          go build -o google-maps-scraper .
+
+      - name: Sonraki batch'i isle
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python agents/ajan1/run_next_batch.py

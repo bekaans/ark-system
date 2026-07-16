@@ -30,13 +30,24 @@ FLAG_PATTERN = re.compile("|".join(FLAG_KEYWORDS), re.IGNORECASE)
 def main() -> None:
     supabase = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SECRET_KEY"])
 
-    leads = (
-        supabase.table("leads")
-        .select("id,business_id,status")
-        .eq("status", "new")
-        .execute()
-        .data
-    )
+    # PostgREST tek istekte en fazla 1000 satir donduruyor - sayfalamadan
+    # cekmek leads buyudukce taramayi sessizce yariyordu.
+    leads = []
+    page_size = 1000
+    offset = 0
+    while True:
+        page = (
+            supabase.table("leads")
+            .select("id,business_id,status")
+            .eq("status", "new")
+            .range(offset, offset + page_size - 1)
+            .execute()
+            .data
+        )
+        leads.extend(page)
+        if len(page) < page_size:
+            break
+        offset += page_size
     print(f"[ARK] {len(leads)} 'new' durumundaki lead taranacak.")
 
     flagged = 0
