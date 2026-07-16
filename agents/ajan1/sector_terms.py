@@ -17,7 +17,7 @@ SECTOR_TERMS = {
     "55.2": "kamp alani",
     "55.3": "karavan parki",
     "55.9": "misafirhane",
-    "56": "restoran",
+    "56": "lokanta",
     "56.1": "restoran",
     "56.3": "kafe bar",
     "74.1": "grafik tasarim ajansi",
