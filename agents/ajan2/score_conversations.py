@@ -69,8 +69,12 @@ ACTION_TO_ESCALATE = {
          "cevap ('dusunecegim' gibi) ise sinirli sureli hediye onerilebilir (1 aylik SEO "
          "hediye - scarcity+reciprocity), ama GERCEK ve TESLIM EDILEBILIR olmali.",
     "A": "Somut teklif + randevu/odeme adimini gonder; zorlayici emir yerine gomulu onay "
-         "ifadesiyle kapat (orn. 'o zaman basliyoruz').",
-    "S": "Kapanisi teyit et, sozlesme/odeme adimini hemen ilerlet, lead.status='won' yap.",
+         "ifadesiyle kapat (orn. 'o zaman basliyoruz'). 1 gun sessiz kalirsa 'karar "
+         "verebildiniz mi' ile isit; hala olumlu donmezse Tier B'deki ayni hediye "
+         "(1 aylik SEO 2.0, sinirli sureli) buna da sunulabilir.",
+    "S": "Kapanisi teyit et, sozlesme/odeme adimini hemen ilerlet, lead.status='won' yap. "
+         "1 gun sessiz kalirsa 'karar verebildiniz mi' ile isit; hala olumlu donmezse "
+         "Tier B'deki ayni hediye (1 aylik SEO 2.0, sinirli sureli) buna da sunulabilir.",
 }
 
 

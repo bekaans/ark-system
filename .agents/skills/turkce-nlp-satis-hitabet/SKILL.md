@@ -3,7 +3,7 @@ name: "turkce-nlp-satis-hitabet"
 description: "dm-qualifier botunun (WhatsApp/Instagram) Turkce musteri sohbetlerinde kullanacagi ses/ton, hitap ve ikna kurallari. Yerel Turk isletme sahipleriyle yapilan ilk temas ve devam sohbetlerinde mesaj yazarken/gozden gecirirken kullan. 'dm-qualifier', 'musteri sohbeti', 'whatsapp mesaji', 'hitap', 'ikna', 'nlp', 'satis tier' gecen her yerde devreye gir. cold-email skill'inin uzerine kurulur ama o B2B soguk e-posta icindir - bu skill Turkce, gundelik, WhatsApp/Instagram DM sohbeti icindir."
 license: internal
 metadata:
-  version: 1.3.1
+  version: 1.4.0
   author: ARK Intelligence Labs
   category: sales-persona
   updated: 2026-07-16
@@ -272,14 +272,32 @@ Sohbet ilerledikce `agents/ajan2/score_conversations.py` her konusmayi asagidaki
 
 | Tier | Anlami | S'e yukseltme aksiyonu |
 |---|---|---|
-| **S** | Satis/kapanis sinyali (odeme, IBAN, "anlastik") | Kapanisi teyit et, sozlesme/odeme adimini hemen ilerlet |
-| **A** | Randevu/demo/fiyat talebi net | Somut teklif + randevu linki gonder, gomulu onayla kapat |
+| **S** | Satis/kapanis sinyali (odeme, IBAN, "anlastik") | Kapanisi teyit et, sozlesme/odeme adimini hemen ilerlet; 1 gun sessiz kalirsa asagidaki isitma+hediye akisina gir |
+| **A** | Randevu/demo/fiyat talebi net | Somut teklif + randevu linki gonder, gomulu onayla kapat; 1 gun sessiz kalirsa asagidaki isitma+hediye akisina gir |
 | **B** | Ilgi var ama tereddut/itiraz var | Itirazi deger/ROI cercevesine sok, SPESIFIK gun/saat oner; kacamak cevap ise sinirli sureli hediyeyle (bkz. Ikna Teknikleri #7) karari one cek |
 | **C** | Merak/ilk soru asamasi | Meragini somut bir bulguya bagla, TEK net soru sor |
 | **D** | Soguk/henuz sinyal yok | Dusuk baskili reaktivasyon sorusu gonder |
 
 Yeni sohbetlerde ("ilk 10 sohbet" gibi) bu script'i calistirip ciktiyi skor sirasina
 gore oku, en yuksek tier'daki sohbetlere once aksiyon al.
+
+### A/S Tier'de 1 Gun Sessizlik Olursa (Isitma + Gecikmeli Hediye)
+
+Musteri A veya S tier'deyken (zaten guclu ilgi/kapanis sinyali vermisken) 1 gun
+boyunca hic mesaj yazmazsa, D-tier'in soguk reaktivasyon sorusundan ("vaz mi
+gectiniz" gibi) FARKLI bir cumle kullan - bu musteri zaten ileri bir asamadaydi,
+geriye-donuk/suclayici degil, ilerleyisi varsayan bir ton gerekir:
+
+> "merhabalar, karar verebildiniz mi"
+
+Bu mesaja yanit gelmez veya gelen yanit hala "almayacak gibi" bir sinyal
+verirse (kacamak/olumsuz), **Tier B'deki AYNI hediye teklifi** (1 ay SEO 2.0,
+sinirli sureli - bkz. Ikna Teknikleri #7) bu musterilere de sunulur. Yani
+hediye SADECE Tier B'ye ozel degil - iki yoldan biriyle hak edilir:
+1. Direkt Tier B (kacamak/tereddutlu cevap), VEYA
+2. A/S tier'ken 1 gun sessiz kalip, isitma mesajina da olumlu donmeyen.
+
+D, C veya hala aktif/yanit veren A/S sohbetlerine bu hediye ASLA sunulmaz.
 
 ---
 
@@ -329,11 +347,14 @@ Bu yuzden ton kararlarini bu istatistige degil, yukaridaki somut tekniklere daya
 
 ### 7. Kacamak Cevaba Karsi: Kisiye Ozel, Sinirli Sureli Hediye (Exclusivity + Scarcity + Reciprocity)
 
-**SADECE kararsizlara.** Bu hediye HER konusmaya/musteriye sunulmaz - SADECE
-gercekten kacamak/tereddutlu cevap veren (Tier B) musteriye ozeldir. Net ilgisiz
-(D), henuz kesif asamasinda olan (C), zaten ilerlemis (A/S) sohbetlere bu hediye
-ASLA teklif edilmez. Herkese verilirse hem "kisiye ozel" cercevesi (exclusivity)
-anlamsizlasir hem de gereksiz yere gercek bir hizmeti bedava dagitmis oluruz.
+**SADECE kararsizlara.** Bu hediye HER konusmaya/musteriye sunulmaz - iki yoldan
+biriyle hak edilir: (1) direkt Tier B (kacamak/tereddutlu cevap), (2) A/S
+tier'ken 1 gun sessiz kalip "karar verebildiniz mi" isitma mesajina da olumlu
+donmeyen musteri (bkz. yukarida "A/S Tier'de 1 Gun Sessizlik Olursa"). Net
+ilgisiz (D), henuz kesif asamasinda olan (C), veya hala aktif/yanit veren A/S
+sohbetlere bu hediye ASLA teklif edilmez. Herkese verilirse hem "kisiye ozel"
+cercevesi (exclusivity) anlamsizlasir hem de gereksiz yere gercek bir hizmeti
+bedava dagitmis oluruz.
 
 Musteri "dusunecegim", "bakarim", "sonra donerim" gibi kacamak/oyalayici bir cevap
 verirse - direkt "hayir" degil ama karar da vermiyorsa - ayni pasif teklifi tekrar
