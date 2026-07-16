@@ -66,7 +66,7 @@ ihtiyaç doğarsa bakiye yüklenecek.
 ## Kurulum durumu
 
 **S0 — Marka + Altyapı**
-- [ ] 1. Domain + marka araştırması — yapılmadı (iş/marka kararı, kullanıcı yapmalı)
+- [x] 1. Domain + marka araştırması — **arkintelligencelabs** olarak karar verildi (ilk denemede "arkintellenge" yazım hatası yapıldı, düzeltildi; ayrıca doğru yazım "arkintelligence.com" 2018'den beri başkasına ait ve 2033'e kadar kilitli olduğu için "labs" eklendi). Kayıt: turkticaret.net, uzantılar `.com` `.store` `.com.tr` `.online`, 1 yıllık, başlangıç 2026-07-16 (yenileme: 2027-07-16). Tümü müsaitlik kontrolünden geçti (whois ile doğrulandı).
 - [ ] 2. Logo — yapılmadı
 - [ ] 3. Instagram + LinkedIn hesapları — yapılmadı
 - [ ] 4. Google Workspace kurumsal mail — yapılmadı
