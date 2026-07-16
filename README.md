@@ -25,6 +25,9 @@ S1: lead makinesi, S2: şablon/vitrin, S3: bot/reklam/CRM, S4: tam otomasyon.
   Ark Intelligence'in kendi web sitesi (3D/7D) müşterilerine aylık sabit 2.500 TL
   (bundle indirimi). dm-qualifier'da kaçamak-cevap durumunda 1 aylık sınırlı-süreli
   hediye olarak da kullanılıyor (gerçek değeri 2.500 TL, website müşterisi için).
+  Ayrıca site teslim edilip müşteri memnuniyeti teyit edildikten SONRA (kesinlikle
+  öncesinde değil) SEO 2.0 almamış müşterilere çapraz-satış olarak da sunuluyor
+  (SKILL.md → "Teslim-Sonrası SEO 2.0 Çapraz-Satış").
 
 Bu üçlü yapı S2 (şablon/vitrin) ve madde 34 (fiyat kademeleri) için referans
 alınmalı — henüz `leads.estimated_deal_value`/A-B-C tier'larına 3D/7D/SEO 2.0
