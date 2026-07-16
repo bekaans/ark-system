@@ -12,6 +12,16 @@ mümkün olduğunca insansız yürüten bir sistem. Orijinal 40 maddelik yol har
 `~/Downloads/ark-kontrol-listesi.html` daha kısa bir önceki sürüm) — S0: marka/altyapı,
 S1: lead makinesi, S2: şablon/vitrin, S3: bot/reklam/CRM, S4: tam otomasyon.
 
+**İki hizmet katmanı var** (dm-qualifier persona skill'inde belgelendi,
+`.agents/skills/turkce-nlp-satis-hitabet/SKILL.md` → "Hizmetlerimiz"):
+- **3D Web Sitesi** — sektöre göre özelleştirilmiş, animasyonlu, özel efektli site.
+  Müşterinin kendi fotoğrafı gerekmez, daha hızlı teslim, daha erişilebilir fiyat.
+- **7D Web Sitesi** — 3D'nin üstüne, müşterinin kendi işletme/ürün fotoğraflarını
+  isteyip bunları animasyonlu siteye taşıyan premium katman (fotoğraf toplama adımı
+  gerektirir). Bu ikili yapı S2 (şablon/vitrin) ve madde 34 (fiyat kademeleri) için
+  referans alınmalı — henüz `leads.estimated_deal_value`/A-B-C tier'larına 3D/7D
+  ayrımı işlenmedi, bu bağlantı ileride kurulacak.
+
 **Önemli:** PDF'teki tam plan bu repodaki mimariden daha geniş — ayrıca **Cortex** (GPT
 çapraz-model kod denetçisi), ayrı **Frontend/Backend İnşaatçı** Claude Code rolleri,
 **mission-control** (Bexi/Yönetici için önerilen hazır araç) ve **mem0** (uzun vadeli org
