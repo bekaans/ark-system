@@ -62,6 +62,8 @@ create table if not exists leads (
   sales_tier_score numeric,
   -- SEO 2.0 "ilk ay ucretsiz" hediyesi bir musteriye SADECE BIR KEZ verilir
   seo_gift_given boolean not null default false,
+  -- NocoBase kanban panelinde surukle-birak siralamasi icin (s3-6)
+  kanban_sort bigint,
   created_at timestamptz not null default now()
 );
 
