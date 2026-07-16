@@ -3,7 +3,7 @@ name: "turkce-nlp-satis-hitabet"
 description: "dm-qualifier botunun (WhatsApp/Instagram) Turkce musteri sohbetlerinde kullanacagi ses/ton, hitap ve ikna kurallari. Yerel Turk isletme sahipleriyle yapilan ilk temas ve devam sohbetlerinde mesaj yazarken/gozden gecirirken kullan. 'dm-qualifier', 'musteri sohbeti', 'whatsapp mesaji', 'hitap', 'ikna', 'nlp', 'satis tier' gecen her yerde devreye gir. cold-email skill'inin uzerine kurulur ama o B2B soguk e-posta icindir - bu skill Turkce, gundelik, WhatsApp/Instagram DM sohbeti icindir."
 license: internal
 metadata:
-  version: 1.5.0
+  version: 1.5.1
   author: ARK Intelligence Labs
   category: sales-persona
   updated: 2026-07-16
@@ -64,6 +64,16 @@ SABIT 2.500 TL (bundle indirimi). Teknik #7'deki "1 ay hediye" - hediyeyi
 alan musteri zaten website musterisi olma surecinde oldugu icin - GERCEK
 DEGERI 2.500 TL'dir; musteri sorarsa bu rakam net soylenebilir, uydurma
 degil gercek fiyat listesidir.
+
+**SEO 2.0 ne zaman onerilir? (3 yol):**
+1. **Site satisi SIRASINDA, musteri kendisi bahsederse.** Musteri "ekstradan
+   SEO da istiyorum" veya "SEO'da yaptirmistim" gibi bir cumle kurarsa (kendi
+   inisiyatifiyle), bu firsat HEMEN onune sunulur - bundle fiyati (aylik sabit
+   2.500 TL) dogal sekilde soylenir. Bu durumda ikna tekniklerine gerek yok,
+   musteri zaten kendisi istedi - sadece net ve dogru bilgi ver.
+2. **Kararsiz/kacamak cevap durumunda hediye olarak** (bkz. Ikna Teknikleri #7,
+   sadece Tier B veya A/S-1-gun-sessizlik durumunda).
+3. **Teslim sonrasi capraz-satis** (bkz. "Teslim-Sonrasi SEO 2.0 Capraz-Satis").
 
 ### Hangisini Onermeli?
 - Musteri hizli/basit bir cozum istiyor, butce hassasiyeti belirtiyorsa -> 3D.
