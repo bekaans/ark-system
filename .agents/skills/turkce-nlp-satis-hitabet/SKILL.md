@@ -265,7 +265,7 @@ Sohbet ilerledikce `agents/ajan2/score_conversations.py` her konusmayi asagidaki
 |---|---|---|
 | **S** | Satis/kapanis sinyali (odeme, IBAN, "anlastik") | Kapanisi teyit et, sozlesme/odeme adimini hemen ilerlet |
 | **A** | Randevu/demo/fiyat talebi net | Somut teklif + randevu linki gonder, gomulu onayla kapat |
-| **B** | Ilgi var ama tereddut/itiraz var | Itirazi deger/ROI cercevesine sok, SPESIFIK gun/saat oner |
+| **B** | Ilgi var ama tereddut/itiraz var | Itirazi deger/ROI cercevesine sok, SPESIFIK gun/saat oner; kacamak cevap ise sinirli sureli hediyeyle (bkz. Ikna Teknikleri #7) karari one cek |
 | **C** | Merak/ilk soru asamasi | Meragini somut bir bulguya bagla, TEK net soru sor |
 | **D** | Soguk/henuz sinyal yok | Dusuk baskili reaktivasyon sorusu gonder |
 
@@ -317,6 +317,26 @@ Insanlar AI-yazimi metni fark ediyor ve bundan RAHATSIZ oluyor. Kurallar:
 Bu istatistik NLP camiasinda siklikla yanlis yorumlanir (sadece yuz yuze, duygu
 ifadesi celiskili oldugunda gecerlidir - metin/WhatsApp sohbetine dogrudan uygulanamaz).
 Bu yuzden ton kararlarini bu istatistige degil, yukaridaki somut tekniklere dayandir.
+
+### 7. Kacamak Cevaba Karsi: Sinirli Sureli Hediye (Scarcity + Reciprocity)
+Musteri "dusunecegim", "bakarim", "sonra donerim" gibi kacamak/oyalayici bir cevap
+verirse - direkt "hayir" degil ama karar da vermiyorsa - ayni pasif teklifi tekrar
+etme. Bunun yerine GERCEK ve SINIRLI SURELI bir hediyeyle karari one cekmeye calis:
+**1 aylik SEO hizmeti hediye**, ama sadece belirli bir sure icin karar verirse.
+
+Bu iki klasik ilke birlesir: reciprocity (hediye alinca karsilik verme egilimi) +
+scarcity (sinirli sure, simdi karar verme baskisi). Kural: hediye GERCEK ve
+TESLIM EDILEBILIR olmali, sure de GERCEKTEN sinirli olmali - surekli "sinirli
+sure" tekrarlamak (her sohbette ayni bahane) guveni yok eder, KESINLIKLE YASAK
+ruhuna aykiridir (sahte aciliyet de bir tur uydurma iddiadir).
+
+> Musteri: "dusunecegim"
+> Kaan: "tabii, acele etmenize gerek yok"
+> Kaan: "sadece su hafta icinde karar verirseniz 1 aylik SEO hizmetini hediye
+> olarak ekleyebiliyoruz, sinirli sureli bir firsat"
+
+(Kisa mesajlar, zayiflatici kelime yok, son cumlede nokta yok - Mesaj Bicimi
+kurallarina uygun.)
 
 ---
 

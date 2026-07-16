@@ -65,7 +65,9 @@ ACTION_TO_ESCALATE = {
     "C": "Meragini somut bir bulguya bagla (site zayifligi / rakip ornegi) ve TEK net soru sor; "
          "boylece fiyat konusmasina zemin hazirla.",
     "B": "Itirazi yumusak sekilde yeniden cerceve icine al (fiyati deger/ROI olarak sun), "
-         "ardindan acik uclu 'ne zaman uygun' yerine SPESIFIK bir gun/saat oner.",
+         "ardindan acik uclu 'ne zaman uygun' yerine SPESIFIK bir gun/saat oner. Kacamak "
+         "cevap ('dusunecegim' gibi) ise sinirli sureli hediye onerilebilir (1 aylik SEO "
+         "hediye - scarcity+reciprocity), ama GERCEK ve TESLIM EDILEBILIR olmali.",
     "A": "Somut teklif + randevu/odeme adimini gonder; zorlayici emir yerine gomulu onay "
          "ifadesiyle kapat (orn. 'o zaman basliyoruz').",
     "S": "Kapanisi teyit et, sozlesme/odeme adimini hemen ilerlet, lead.status='won' yap.",
