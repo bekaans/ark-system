@@ -21,8 +21,10 @@ S1: lead makinesi, S2: şablon/vitrin, S3: bot/reklam/CRM, S4: tam otomasyon.
   gerektirir).
 - **SEO 2.0** — düz/generik SEO değil; sektöre ve bölgeye özel arama sorgularında
   (ör. "[şehir] oto galerisi") müşterinin sitesini reklama para vermeden organik
-  olarak üst sıralara taşıyan ayrı bir hizmet. dm-qualifier'da kaçamak-cevap
-  durumunda 1 aylık sınırlı-süreli hediye olarak da kullanılıyor.
+  olarak üst sıralara taşıyan ayrı bir hizmet. Bağımsız istenirse aylık 5.000 TL,
+  Ark Intelligence'in kendi web sitesi (3D/7D) müşterilerine aylık sabit 2.500 TL
+  (bundle indirimi). dm-qualifier'da kaçamak-cevap durumunda 1 aylık sınırlı-süreli
+  hediye olarak da kullanılıyor (gerçek değeri 2.500 TL, website müşterisi için).
 
 Bu üçlü yapı S2 (şablon/vitrin) ve madde 34 (fiyat kademeleri) için referans
 alınmalı — henüz `leads.estimated_deal_value`/A-B-C tier'larına 3D/7D/SEO 2.0

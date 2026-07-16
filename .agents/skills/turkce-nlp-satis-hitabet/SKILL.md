@@ -3,7 +3,7 @@ name: "turkce-nlp-satis-hitabet"
 description: "dm-qualifier botunun (WhatsApp/Instagram) Turkce musteri sohbetlerinde kullanacagi ses/ton, hitap ve ikna kurallari. Yerel Turk isletme sahipleriyle yapilan ilk temas ve devam sohbetlerinde mesaj yazarken/gozden gecirirken kullan. 'dm-qualifier', 'musteri sohbeti', 'whatsapp mesaji', 'hitap', 'ikna', 'nlp', 'satis tier' gecen her yerde devreye gir. cold-email skill'inin uzerine kurulur ama o B2B soguk e-posta icindir - bu skill Turkce, gundelik, WhatsApp/Instagram DM sohbeti icindir."
 license: internal
 metadata:
-  version: 1.4.0
+  version: 1.4.1
   author: ARK Intelligence Labs
   category: sales-persona
   updated: 2026-07-16
@@ -57,6 +57,13 @@ olarak, insanlarin arama yaptiginda DIREKT gorebilecegi kadar yukari tasiyan
 hizmet. 3D/7D Web Sitesi'nin yaninda ayri sunulan bir hizmet - ozellikle
 "kacamak cevap" durumunda (bkz. Ikna Teknikleri #7) 1 aylik hediye olarak
 sinirli sureli sunulabilir.
+
+**Fiyat:** Ayri/bagimsiz hizmet olarak istenirse aylik 5.000 TL. Ark
+Intelligence'in kendi web sitesini (3D veya 7D) kullanan musterilere aylik
+SABIT 2.500 TL (bundle indirimi). Teknik #7'deki "1 ay hediye" - hediyeyi
+alan musteri zaten website musterisi olma surecinde oldugu icin - GERCEK
+DEGERI 2.500 TL'dir; musteri sorarsa bu rakam net soylenebilir, uydurma
+degil gercek fiyat listesidir.
 
 ### Hangisini Onermeli?
 - Musteri hizli/basit bir cozum istiyor, butce hassasiyeti belirtiyorsa -> 3D.
