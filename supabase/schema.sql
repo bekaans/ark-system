@@ -60,6 +60,8 @@ create table if not exists leads (
   -- sohbet-ici satisa-gecme tier'i (leads.tier'den BAGIMSIZ, konusma ilerledikce guncellenir)
   sales_tier text check (sales_tier in ('S','A','B','C','D')),  -- S = satis/kapanis
   sales_tier_score numeric,
+  -- SEO 2.0 "ilk ay ucretsiz" hediyesi bir musteriye SADECE BIR KEZ verilir
+  seo_gift_given boolean not null default false,
   created_at timestamptz not null default now()
 );
 
