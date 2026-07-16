@@ -49,11 +49,17 @@ create table if not exists leads (
   business_id uuid references businesses(id) not null,
   sector_id uuid references sectors(id),
   lead_score numeric,
-  tier text check (tier in ('A', 'B', 'C')),
+  tier text check (tier in ('A', 'B', 'C')),        -- on-satis: isletme/firsat degeri tier'i
   estimated_deal_value numeric,
   status text not null default 'new'
     check (status in ('new','contacted','qualified','meeting','proposal','won','lost')),
   outreach_draft text,
+  -- dm-qualifier yanit gecikme durumu (mirroring - musteri hizina gore ayarlanir)
+  response_stage int not null default 1,             -- 1=60-90sn, 2=stage1-20sn, 3=10-15sn
+  last_delay_seconds numeric,
+  -- sohbet-ici satisa-gecme tier'i (leads.tier'den BAGIMSIZ, konusma ilerledikce guncellenir)
+  sales_tier text check (sales_tier in ('S','A','B','C','D')),  -- S = satis/kapanis
+  sales_tier_score numeric,
   created_at timestamptz not null default now()
 );
 
