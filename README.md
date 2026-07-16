@@ -73,7 +73,7 @@ kaldırıp gpt-oss-120b/zai-glm-4.7/gemma-4-31b'ye geçti, Gemini'de gemini-3.1-
 | Sağlayıcı | Kullanım | Kota | Durum |
 |---|---|---|---|
 | Cerebras (`gpt-oss-120b`) | Ajan 1 birincil | 14.400 istek/gün | ✅ test edildi |
-| Groq (`llama-3.3-70b-versatile`) | dmq/Bexi birincil | 1.000 istek/gün, düşük gecikme | ✅ test edildi |
+| Groq (`llama-3.3-70b-versatile`) | dmq birincil, Bexi yedek | 1.000 istek/gün, düşük gecikme | ✅ test edildi |
 | Google AI Studio (Gemini) | Yedek katman (çoğu ajan) | 1.500 istek/gün/model | ⚠️ flash-lite ✅, tam flash geçici 503 verdi (Google tarafı) |
 | OpenRouter (çeşitli `:free`) | Son çare yedek | Hesap-bazlı paylaşımlı 50/gün (kredi yoksa) | ✅ Nemotron modelleri calisti, Llama 3.3 free rota gecici 429 (Venice saglayici, hesabimizla ilgisiz) |
 | OpenRouter (`deepseek/deepseek-v4-pro`) | Bexi birincil | Ücretli, $0.435/$0.87 per 1M token (giriş/çıkış, 2026-07-16 canlı doğrulandı) | ✅ 2026-07-16: $5 bakiye yüklendi, test edildi (gerçek çağrı: 24 giriş + 65 çıkış token = $0.000067) |
@@ -83,6 +83,19 @@ kaldırıp gpt-oss-120b/zai-glm-4.7/gemma-4-31b'ye geçti, Gemini'de gemini-3.1-
 varsayıyordu (ücretsiz zincir değil). Karar: Anthropic key'i plana uymak için eklendi ama
 maliyeti sıfırda tutmak için sadece son-çare fallback yapıldı — gerçek trafik gösterip
 ihtiyaç doğarsa bakiye yüklenecek.
+
+### dm-qualifier model zinciri — parametre sayıları (2026-07-16 doğrulandı)
+
+| Sıra | Model | Parametre |
+|---|---|---|
+| 1 (birincil) | Groq `llama-3.3-70b-versatile` | **70B**, dense — Meta'nın resmi model kartında açık |
+| 2 (yedek) | Gemini `gemini-flash-latest` | Google resmi olarak açıklamıyor |
+| 3 (yedek) | OpenRouter `meta-llama/llama-3.3-70b-instruct:free` | **70B**, dense — Groq'takiyle aynı Llama 3.3 70B |
+| 4 (son çare) | Anthropic `claude-haiku-4-5-20251001` | Anthropic resmi olarak açıklamıyor |
+
+Google ve Anthropic, kapalı-kaynak modellerinin parametre sayısını hiçbir zaman resmi
+olarak yayınlamıyor — bu bir eksik veri değil, iki firmanın da kalıcı politikası.
+Sadece açık-kaynak (Meta Llama) satırları için kesin rakam var.
 
 ## Kurulum durumu
 
