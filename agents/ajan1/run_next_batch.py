@@ -40,7 +40,9 @@ from audit_sites import compute_seo_score, detect_tech  # noqa: E402
 
 DATA_DIR = Path(__file__).parent / "data"
 SCRAPER_BIN = ROOT / "agents" / "google-maps-scraper" / "google-maps-scraper"
-BATCH_SIZE = 10          # her calistirmada en fazla kac (sektor,sehir) cifti islensin
+BATCH_SIZE = 3           # her calistirmada en fazla kac (sektor,sehir) cifti islensin -
+                         # her cift onlarca isletme detay sayfasi acabiliyor, CI'da
+                         # yavas kalmasin diye kucuk tutuluyor ("acele degil, surekli")
 AUDIT_LIMIT = 15         # her calistirmada en fazla kac yeni site denetlensin
 
 ALL_CITIES = CITIES + CITIES_EXPANSION
@@ -120,12 +122,12 @@ def run_scraper(batch: list[dict]) -> tuple[Path, Path]:
                 stdout=log_f,
                 stderr=subprocess.STDOUT,
                 check=True,
-                timeout=600,
+                timeout=900,
             )
-        except subprocess.CalledProcessError:
-            # CI'da log dosyasi calismadan sonra kayboluyor - hatayi hemen
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            # CI'da is klasoru calismadan sonra kayboluyor - hatayi hemen
             # buraya bas ki Actions ciktisinda gorulebilsin.
-            print("[ARK] scraper basarisiz oldu, log:")
+            print("[ARK] scraper basarisiz oldu/zaman asimina ugradi, log:")
             print(log_path.read_text()[-4000:])
             raise
     return log_path, results_path
