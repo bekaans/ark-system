@@ -1,0 +1,151 @@
+:root {
+  --ark-primary: #1d1d1f;
+  --ark-secondary: #ff9500;
+  --ark-font-heading: "Poppins", sans-serif;
+  --ark-font-body: "Inter", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--ark-font-body);
+  color: var(--ark-primary);
+  background: #fff;
+}
+
+.ark-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ark-hero {
+  overflow: hidden;
+}
+
+.ark-hero-frames,
+.ark-animation2-frames {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+}
+
+.frame-sequence-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ark-hero-copy {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  padding: 0 1.5rem;
+}
+
+.ark-hero-copy h1 {
+  font-family: var(--ark-font-heading);
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 700;
+}
+
+.ark-hero-copy p {
+  margin-top: 1rem;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+.ark-services {
+  background: #fafafc;
+  padding: 4rem 1.5rem;
+}
+
+.ark-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  width: 100%;
+}
+
+.ark-service-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.ark-service-card h3 {
+  font-family: var(--ark-font-heading);
+  margin-bottom: 0.5rem;
+}
+
+.ark-social-proof {
+  background: #fff;
+  padding: 4rem 1.5rem;
+}
+
+.ark-testimonials {
+  max-width: 700px;
+  width: 100%;
+}
+
+.ark-testimonials blockquote {
+  font-style: italic;
+  font-size: 1.25rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.ark-testimonials cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ark-secondary);
+}
+
+.ark-contact {
+  flex-direction: column;
+  gap: 1.5rem;
+  background: var(--ark-primary);
+  color: #fff;
+  text-align: center;
+  padding: 4rem 1.5rem;
+}
+
+.ark-contact h2 {
+  font-family: var(--ark-font-heading);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.ark-cta-button {
+  display: inline-block;
+  background: var(--ark-secondary);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.9rem 2rem;
+  border-radius: 999px;
+}
+
+.ark-error {
+  padding: 3rem;
+  text-align: center;
+  color: #c0392b;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #111;
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "site_id": "00000000-0000-0000-0000-000000000000",
+  "tier": "3D",
+  "business": {
+    "name": "Ornek Oto Galeri",
+    "sector_code": "45.1",
+    "sector_name": "Oto galeri",
+    "city": "Antalya",
+    "address": "Ornek Mah. Ornek Cad. No:1, Antalya",
+    "phone": "+905000000000",
+    "whatsapp": "+905000000000",
+    "instagram": "@ornekotogaleri",
+    "email": "info@ornekotogaleri.example"
+  },
+  "design": {
+    "primary_color": "#1D1D1F",
+    "secondary_color": "#FF9500",
+    "font_heading": "Poppins",
+    "font_body": "Inter"
+  },
+  "sections": {
+    "hero": {
+      "headline": "Antalya'nin Guvenilir Oto Galerisi",
+      "subheadline": "Ikinci el arac alim-satiminda 10 yillik tecrube",
+      "video_asset": "assets/hero-frames/",
+      "frame_count": 180
+    },
+    "services_grid": {
+      "items": [
+        {"title": "Ikinci El Arac Satisi", "description": "Gecmisi seffaf, ekspertiz raporlu araclar", "icon": "car"},
+        {"title": "Arac Alimi", "description": "Aracinizi ayni gun nakit degerinde alalim", "icon": "cash"},
+        {"title": "Kredi Destegi", "description": "Anlasmali bankalarla uygun kredi secenekleri", "icon": "bank"}
+      ]
+    },
+    "animation_2": {
+      "video_asset": "assets/showcase-frames/",
+      "frame_count": 120
+    },
+    "social_proof": {
+      "testimonials": [
+        {"author": "Ornek Musteri", "text": "Cok memnun kaldim, tavsiye ederim.", "rating": 5}
+      ],
+      "photos": []
+    },
+    "contact": {
+      "map_embed": "https://maps.google.com/embed?example",
+      "hours": "Pazartesi-Cumartesi 09:00-19:00",
+      "cta_text": "Hemen WhatsApp'tan Yazin"
+    }
+  },
+  "media": {
+    "customer_photos": [],
+    "product_photos": []
+  },
+  "seo": {
+    "meta_title": "Ornek Oto Galeri | Antalya Ikinci El Arac",
+    "meta_description": "Antalya'da guvenilir ikinci el arac alim-satimi. Ekspertiz raporlu araclar, uygun kredi secenekleri.",
+    "target_keywords": ["Antalya oto galeri", "Antalya ikinci el arac", "Antalya arac alimi"],
+    "og_image": "assets/og-image.jpg"
+  },
+  "deploy": {
+    "subdomain": "ornekler.arkintelligencelabs.com/oto-galeri",
+    "status": "draft"
+  }
+}
