@@ -94,24 +94,33 @@ export function createCanvasFrameSequence(options: FrameSequenceOptions): {
     images.push(img);
   }
 
-  const trigger = ScrollTrigger.create({
-    trigger: container,
-    start: "top top",
-    end: pinDuration,
-    pin: true,
-    scrub: true,
-    onUpdate: (self) => {
-      frameState.index = self.progress * (frameCount - 1);
-      render();
-    },
-  });
+  // DESIGN.md "Do's and Don'ts": reduced-motion tercih eden ziyaretciye
+  // scroll-scrubbing dayatma - tek bir statik (ortadaki) kare goster.
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let trigger: ScrollTrigger | null = null;
+
+  if (reducedMotion) {
+    frameState.index = Math.floor((frameCount - 1) / 2);
+  } else {
+    trigger = ScrollTrigger.create({
+      trigger: container,
+      start: "top top",
+      end: pinDuration,
+      pin: true,
+      scrub: true,
+      onUpdate: (self) => {
+        frameState.index = self.progress * (frameCount - 1);
+        render();
+      },
+    });
+  }
 
   window.addEventListener("resize", resizeCanvas);
   resizeCanvas();
 
   return {
     destroy() {
-      trigger.kill();
+      trigger?.kill();
       window.removeEventListener("resize", resizeCanvas);
       canvas.remove();
     },
