@@ -107,6 +107,57 @@ def ask_claude(prompt: str) -> str:
     return result.stdout.strip() or result.stderr.strip() or "(bos cevap)"
 
 
+def _read_env(key: str) -> str:
+    env_path = ARK_DIR / "litellm" / ".env"
+    for line in env_path.read_text().splitlines():
+        if line.startswith(f"{key}="):
+            return line.split("=", 1)[1].strip()
+    return ""
+
+
+def _supabase_count(table: str, filter_qs: str = "") -> int:
+    url = _read_env("SUPABASE_URL")
+    key = _read_env("SUPABASE_SECRET_KEY")
+    qs = f"?select=id{('&' + filter_qs) if filter_qs else ''}"
+    req = urllib.request.Request(
+        f"{url}/rest/v1/{table}{qs}",
+        headers={
+            "apikey": key,
+            "Authorization": f"Bearer {key}",
+            "Prefer": "count=exact",
+            "Range": "0-0",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        content_range = resp.headers.get("Content-Range", "*/0")
+    return int(content_range.split("/")[-1])
+
+
+def generate_agent_status() -> str:
+    # "durum nedir" hizli yolu: gercek Supabase verisiyle diger ajanlarin
+    # (Ajan 1 pipeline + dm-qualifier sohbetleri) durumunu ANINDA raporlar.
+    try:
+        businesses = _supabase_count("businesses")
+        leads = _supabase_count("leads")
+        convos = _supabase_count("conversations")
+        tier_s = _supabase_count("leads", "sales_tier=eq.S")
+        tier_a = _supabase_count("leads", "sales_tier=eq.A")
+        tier_b = _supabase_count("leads", "sales_tier=eq.B")
+        tier_d = _supabase_count("leads", "sales_tier=eq.D")
+    except Exception as exc:
+        return f"Durum sorgulanamadi: {exc}"
+
+    lines = [f"ARK durum - {time.strftime('%d.%m.%Y %H:%M')}"]
+    lines.append(f"Ajan 1: {businesses} isletme toplandi, {leads} lead skorlandi (surekli dongu calisiyor)")
+    lines.append("")
+    if convos == 0:
+        lines.append("dm-qualifier: henuz kimseyle konusmadi (WhatsApp/Chatwoot baglantisi bekliyor - s3-1/s3-2)")
+    else:
+        lines.append(f"dm-qualifier: {convos} mesaj, {tier_s} satisa donuk (S), {tier_a} randevu asamasinda (A), "
+                      f"{tier_b} isitilmaya calisiliyor (B), {tier_d} soguk/sessiz (D)")
+    return "\n".join(lines)
+
+
 def generate_summary() -> str:
     # Kullanici "1" yazinca agir bir `claude -p` cagrisi (30-60sn) yerine
     # README checklist durumu + son commitleri okuyup ANINDA ozet donduruyoruz.
@@ -162,9 +213,14 @@ def run() -> None:
 
             history = append_history("user", text)
 
-            if text.strip() == "1":
+            normalized = text.strip().lower()
+            if normalized == "1":
                 # Hizli yol: agir agentic cagriyi atla, ozet aninda uretilsin.
                 reply = generate_summary()
+            elif normalized in ("durum nedir", "durum ne", "2"):
+                # Hizli yol: diger ajanlarin (Ajan 1 + dm-qualifier) durumunu
+                # gercek Supabase verisiyle aninda raporla.
+                reply = generate_agent_status()
             else:
                 context = format_history(history[:-1])
                 prompt = (
