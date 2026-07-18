@@ -46,7 +46,7 @@ create table if not exists audits (
 -- 4) leads: skorlanmis lead'ler + tier
 create table if not exists leads (
   id uuid primary key default gen_random_uuid(),
-  business_id uuid references businesses(id) not null,
+  business_id uuid references businesses(id) not null unique,  -- score_leads.py upsert(on_conflict="business_id") icin sart
   sector_id uuid references sectors(id),
   lead_score numeric,
   tier text check (tier in ('A', 'B', 'C')),        -- on-satis: isletme/firsat degeri tier'i
