@@ -10,3 +10,7 @@ agents/WorldOfTaxonomy/
 agents/google-maps-scraper/
 agents/ajan1/data/
 nocobase/
+agents/bexi-telegram/.offset
+agents/bexi-telegram/.pid
+agents/bexi-telegram/bridge.log
+agents/bexi-telegram/history.jsonl
