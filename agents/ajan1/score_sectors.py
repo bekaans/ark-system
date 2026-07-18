@@ -18,32 +18,55 @@ ROOT = Path(__file__).parent.parent.parent
 load_dotenv(ROOT / "litellm" / ".env")
 
 
+def _fetch_all(supabase, table: str, select: str) -> list[dict]:
+    # PostgREST sunucu tarafinda sayfa basina azami 1000 satirla siniirli -
+    # Range basligina ne yazilirsa yazilsin. business_id icin .in_() kullanip
+    # yuzlerce UUID'yi URL'ye gomen onceki yaklasim (score_sectors.py'da kalabalik
+    # sektorlerde "JSON could not be generated" 400 hatasina yol aciyordu -
+    # proxy katmani asiri uzun URL'yi reddedip JSON olmayan govde donduruyordu)
+    # bu yuzden butun tabloyu sayfalayip Python tarafinda birlestiriyoruz.
+    rows: list[dict] = []
+    offset = 0
+    page_size = 1000
+    while True:
+        page = (
+            supabase.table(table)
+            .select(select)
+            .range(offset, offset + page_size - 1)
+            .execute()
+            .data
+        )
+        rows.extend(page)
+        if len(page) < page_size:
+            break
+        offset += page_size
+    return rows
+
+
 def main() -> None:
     supabase = create_client(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SECRET_KEY"])
 
     sectors = supabase.table("sectors").select("id,nace_code,name,business_volume").execute().data
+    businesses = _fetch_all(supabase, "businesses", "id,sector_id")
+    audits = _fetch_all(supabase, "audits", "business_id,has_animation,seo_score")
+
+    business_to_sector = {b["id"]: b["sector_id"] for b in businesses if b["sector_id"]}
+    audits_by_sector: dict[str, list[dict]] = {}
+    for a in audits:
+        sector_id = business_to_sector.get(a["business_id"])
+        if sector_id:
+            audits_by_sector.setdefault(sector_id, []).append(a)
 
     results = []
     for sector in sectors:
-        businesses = (
-            supabase.table("businesses").select("id").eq("sector_id", sector["id"]).execute().data
-        )
-        business_ids = [b["id"] for b in businesses]
-        if not business_ids:
+        sector_audits = audits_by_sector.get(sector["id"], [])
+        if not sector_audits:
             continue
 
-        audits = (
-            supabase.table("audits")
-            .select("has_animation,seo_score")
-            .in_("business_id", business_ids)
-            .execute()
-            .data
+        weak_count = sum(
+            1 for a in sector_audits if not a["has_animation"] and (a["seo_score"] or 0) < 60
         )
-        if not audits:
-            continue
-
-        weak_count = sum(1 for a in audits if not a["has_animation"] and (a["seo_score"] or 0) < 60)
-        weakness_ratio = weak_count / len(audits)
+        weakness_ratio = weak_count / len(sector_audits)
         volume = sector["business_volume"] or 0
         # basit skor: hacim (normalize, /100) x zayiflik orani x 100
         opportunity_score = round((volume / 100) * weakness_ratio * 100, 1)
@@ -53,7 +76,7 @@ def main() -> None:
                 "id": sector["id"],
                 "nace_code": sector["nace_code"],
                 "name": sector["name"],
-                "audited": len(audits),
+                "audited": len(sector_audits),
                 "weakness_ratio": round(weakness_ratio, 2),
                 "volume": volume,
                 "opportunity_score": opportunity_score,
