@@ -1,0 +1,45 @@
+name: Ajan Ar-Ge - Haftalik Model Karsilastirmasi
+
+# Canli musteri trafigine dokunmaz - SADECE sabit test senaryolariyla
+# NVIDIA NIM'in ucretsiz/degerlendirme katmanini kullanarak mevcut
+# produksiyon modeliyle (dmq-groq) alternatif modelleri karsilastirir.
+# Haftalik (NVIDIA'nin 1000 ucretsiz kredisini yavas tuketmek icin
+# bilerek seyrek), manuel de tetiklenebilir.
+on:
+  schedule:
+    - cron: "0 6 * * 1"  # her Pazartesi 06:00 UTC (09:00 TR)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bagimliliklari kur
+        run: pip install litellm pyyaml python-dotenv requests
+
+      - name: Karsilastirmayi calistir
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python agents/ajan-arge/model_bench.py
+
+      - name: Raporu commit'le
+        run: |
+          git config user.name "ark-ajan-arge-bot"
+          git config user.email "actions@github.com"
+          git add agents/ajan-arge/reports/
+          git diff --staged --quiet || git commit -m "Ajan Ar-Ge: haftalik model karsilastirma raporu"
+          git push
