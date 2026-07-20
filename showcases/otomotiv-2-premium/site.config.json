@@ -1,0 +1,88 @@
+{
+  "site_id": "showcase-oto-2",
+  "tier": "A",
+  "business": {
+    "name": "Prestij Motors",
+    "sector_code": "45.1",
+    "sector_name": "Premium arac galerisi",
+    "city": "Istanbul",
+    "address": "Ornek Mah. Ornek Cad. No:2, Istanbul",
+    "phone": "+905000000002",
+    "whatsapp": "+905000000002",
+    "instagram": "@prestijmotors",
+    "email": "info@prestijmotors.example"
+  },
+  "design": {
+    "primary_color": "#0B0B0D",
+    "secondary_color": "#C9A227",
+    "font_heading": "Playfair Display",
+    "font_body": "Inter"
+  },
+  "sections": {
+    "hero": {
+      "headline": "Seckin Arac Sahipleri Icin Ozel Koleksiyon",
+      "subheadline": "Sifir ve az kullanilmis premium/luks segment araclar",
+      "video_asset": "assets/hero-frames/",
+      "frame_count": 120
+    },
+    "services_grid": {
+      "items": [
+        {
+          "title": "Premium Arac Portfoyu",
+          "description": "Ozenle secilmis luks marka araclar",
+          "icon": "car"
+        },
+        {
+          "title": "Danismanlik Hizmeti",
+          "description": "Butceye ve zevke uygun arac secim danismanligi",
+          "icon": "handshake"
+        },
+        {
+          "title": "Takas ve Finansman",
+          "description": "Esnek takas secenekleri, anlasmali bankalarla finansman",
+          "icon": "bank"
+        }
+      ]
+    },
+    "animation_2": {
+      "video_asset": "assets/showcase-frames/",
+      "frame_count": 120
+    },
+    "social_proof": {
+      "testimonials": [
+        {
+          "author": "Ornek Musteri",
+          "text": "Beklentimin cok uzerinde bir hizmet ve arac kalitesi.",
+          "rating": 5
+        }
+      ],
+      "photos": []
+    },
+    "contact": {
+      "map_embed": "https://maps.google.com/embed?example",
+      "hours": "Pazartesi-Cumartesi 10:00-19:00",
+      "cta_text": "Randevu Icin WhatsApp'tan Yazin"
+    }
+  },
+  "media": {
+    "customer_photos": [
+      "assets/customer/oto-2-1.jpg",
+      "assets/customer/oto-2-2.jpg"
+    ],
+    "product_photos": []
+  },
+  "seo": {
+    "meta_title": "Prestij Motors | Istanbul Premium Arac Galerisi",
+    "meta_description": "Istanbul'da premium ve luks segment sifir/ikinci el arac satisi. Ozel danismanlik ve finansman secenekleri.",
+    "target_keywords": [
+      "Istanbul premium arac galerisi",
+      "luks arac satisi",
+      "Istanbul ikinci el luks arac"
+    ],
+    "og_image": "assets/og-image.jpg"
+  },
+  "deploy": {
+    "subdomain": "ornekler.arkintelligencelabs.com/otomotiv-2-premium",
+    "status": "draft"
+  }
+}

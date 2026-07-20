@@ -14,3 +14,5 @@ agents/bexi-telegram/.offset
 agents/bexi-telegram/.pid
 agents/bexi-telegram/bridge.log
 agents/bexi-telegram/history.jsonl
+agents/bexi-telegram/digest.log
+agents/remote-access/watchdog.log

@@ -1,0 +1,88 @@
+{
+  "site_id": "showcase-gida-2",
+  "tier": "A",
+  "business": {
+    "name": "Kavur Kahve",
+    "sector_code": "47.2",
+    "sector_name": "Kahve kavurma ve satis",
+    "city": "Izmir",
+    "address": "Ornek Mah. Ornek Cad. No:2, Izmir",
+    "phone": "+905000000005",
+    "whatsapp": "+905000000005",
+    "instagram": "@kavurkahve",
+    "email": "info@kavurkahve.example"
+  },
+  "design": {
+    "primary_color": "#231710",
+    "secondary_color": "#C77B3F",
+    "font_heading": "Poppins",
+    "font_body": "Inter"
+  },
+  "sections": {
+    "hero": {
+      "headline": "Kendi Kavurdugumuz Cekirdekten, Fincaniniza",
+      "subheadline": "Tek kaynaktan ozel harman ve filtre kahveler",
+      "video_asset": "assets/hero-frames/",
+      "frame_count": 120
+    },
+    "services_grid": {
+      "items": [
+        {
+          "title": "Taze Kavrulmus Cekirdek",
+          "description": "Haftalik kucuk partiler halinde kavrulur",
+          "icon": "coffee"
+        },
+        {
+          "title": "Filtre Kahve Barı",
+          "description": "V60, chemex ve french press secenekleri",
+          "icon": "cup"
+        },
+        {
+          "title": "Abonelik Paketi",
+          "description": "Aylik cekirdek kahve abonelik teslimati",
+          "icon": "package"
+        }
+      ]
+    },
+    "animation_2": {
+      "video_asset": "assets/showcase-frames/",
+      "frame_count": 120
+    },
+    "social_proof": {
+      "testimonials": [
+        {
+          "author": "Ornek Musteri",
+          "text": "Ictigim en dengeli filtre kahve, artik baska yere gitmiyorum.",
+          "rating": 5
+        }
+      ],
+      "photos": []
+    },
+    "contact": {
+      "map_embed": "https://maps.google.com/embed?example",
+      "hours": "Her gun 08:00-22:00",
+      "cta_text": "Abonelik Icin WhatsApp'tan Yazin"
+    }
+  },
+  "media": {
+    "customer_photos": [
+      "assets/customer/gida-2-1.jpg",
+      "assets/customer/gida-2-2.jpg"
+    ],
+    "product_photos": []
+  },
+  "seo": {
+    "meta_title": "Kavur Kahve | Izmir Kahve Kavurma Atolyesi",
+    "meta_description": "Izmir'de taze kavrulmus ozel harman kahve, filtre kahve bari ve aylik abonelik teslimati.",
+    "target_keywords": [
+      "Izmir kahve kavurma",
+      "Izmir filtre kahve",
+      "kahve abonelik"
+    ],
+    "og_image": "assets/og-image.jpg"
+  },
+  "deploy": {
+    "subdomain": "ornekler.arkintelligencelabs.com/gida-icecek-2-kahve",
+    "status": "draft"
+  }
+}

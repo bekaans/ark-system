@@ -1,0 +1,88 @@
+{
+  "site_id": "showcase-gida-3",
+  "tier": "A",
+  "business": {
+    "name": "Ustalar Sarkuteri",
+    "sector_code": "47.2",
+    "sector_name": "Sarkuteri ve delikatessen",
+    "city": "Antalya",
+    "address": "Ornek Mah. Ornek Cad. No:3, Antalya",
+    "phone": "+905000000006",
+    "whatsapp": "+905000000006",
+    "instagram": "@ustalarsarkuteri",
+    "email": "info@ustalarsarkuteri.example"
+  },
+  "design": {
+    "primary_color": "#241412",
+    "secondary_color": "#B5443B",
+    "font_heading": "Playfair Display",
+    "font_body": "Inter"
+  },
+  "sections": {
+    "hero": {
+      "headline": "Ustalik Isteyen Lezzetler, Tezgahtan Sofraniza",
+      "subheadline": "Geleneksel sarap, peynir ve sarkuteri urunleri",
+      "video_asset": "assets/hero-frames/",
+      "frame_count": 120
+    },
+    "services_grid": {
+      "items": [
+        {
+          "title": "Sarkuteri Tabaklari",
+          "description": "Ozel gunler icin hazir sarkuteri tabagi",
+          "icon": "plate"
+        },
+        {
+          "title": "Peynir ve Sarap Secimi",
+          "description": "Yerli ve ithal peynir/sarap uzman tavsiyesiyle",
+          "icon": "wine"
+        },
+        {
+          "title": "Kurumsal Ikram",
+          "description": "Toplanti ve etkinlikler icin toplu siparis",
+          "icon": "box"
+        }
+      ]
+    },
+    "animation_2": {
+      "video_asset": "assets/showcase-frames/",
+      "frame_count": 120
+    },
+    "social_proof": {
+      "testimonials": [
+        {
+          "author": "Ornek Musteri",
+          "text": "Misafirlerime hazirlattigim tabak herkesin agzinda kaldi.",
+          "rating": 5
+        }
+      ],
+      "photos": []
+    },
+    "contact": {
+      "map_embed": "https://maps.google.com/embed?example",
+      "hours": "Pazartesi-Cumartesi 09:00-20:00",
+      "cta_text": "Siparis Icin WhatsApp'tan Yazin"
+    }
+  },
+  "media": {
+    "customer_photos": [
+      "assets/customer/gida-3-1.jpg",
+      "assets/customer/gida-3-2.jpg"
+    ],
+    "product_photos": []
+  },
+  "seo": {
+    "meta_title": "Ustalar Sarkuteri | Antalya Sarkuteri ve Delikatessen",
+    "meta_description": "Antalya'da ozel sarkuteri tabaklari, peynir ve sarap secimi, kurumsal ikram siparisleri.",
+    "target_keywords": [
+      "Antalya sarkuteri",
+      "Antalya delikatessen",
+      "sarkuteri tabagi siparisi"
+    ],
+    "og_image": "assets/og-image.jpg"
+  },
+  "deploy": {
+    "subdomain": "ornekler.arkintelligencelabs.com/gida-icecek-3-sarkuteri",
+    "status": "draft"
+  }
+}

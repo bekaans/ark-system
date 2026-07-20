@@ -67,6 +67,7 @@ def main() -> None:
                 .select("id,name,website")
                 .eq("sector_id", sector["id"])
                 .not_.is_("website", "null")
+                .not_.ilike("website", "%instagram.com%")
                 .limit(PER_SECTOR_SAMPLE)
                 .execute()
                 .data

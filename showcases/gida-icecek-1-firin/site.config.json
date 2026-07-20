@@ -1,0 +1,113 @@
+{
+  "site_id": "showcase-gida-1",
+  "tier": "S+",
+  "business": {
+    "name": "Bereket Firin",
+    "sector_code": "47.2",
+    "sector_name": "Firin ve pastane",
+    "city": "Ankara",
+    "address": "Ornek Mah. Ornek Cad. No:1, Ankara",
+    "phone": "+905000000004",
+    "whatsapp": "+905000000004",
+    "instagram": "@bereketfirin",
+    "email": "info@bereketfirin.example"
+  },
+  "design": {
+    "primary_color": "#3B2314",
+    "secondary_color": "#E8A33D",
+    "font_heading": "Playfair Display",
+    "font_body": "Inter"
+  },
+  "sections": {
+    "hero": {
+      "headline": "Her Sabah Taze Firindan Sofraniza",
+      "subheadline": "Geleneksel tarif, gunluk taze uretim",
+      "video_asset": "assets/hero-frames/",
+      "frame_count": 120
+    },
+    "services_grid": {
+      "items": [
+        {
+          "title": "Gunluk Taze Ekmek",
+          "description": "Her sabah taze pisirilen ekmek cesitleri",
+          "icon": "bread"
+        },
+        {
+          "title": "Pasta ve Tatlilar",
+          "description": "Ozel gunler icin siparis uzeri pasta ve tatli",
+          "icon": "cake"
+        },
+        {
+          "title": "Toplu Siparis",
+          "description": "Isyerleri ve etkinlikler icin toplu siparis imkani",
+          "icon": "box"
+        }
+      ]
+    },
+    "animation_2": {
+      "video_asset": "assets/showcase-frames/",
+      "frame_count": 120
+    },
+    "social_proof": {
+      "testimonials": [
+        {
+          "author": "Ornek Musteri",
+          "text": "Yillardir aldigim en lezzetli ekmek, hep taze.",
+          "rating": 5
+        }
+      ],
+      "photos": []
+    },
+    "contact": {
+      "map_embed": "https://maps.google.com/embed?example",
+      "hours": "Her gun 06:00-21:00",
+      "cta_text": "Siparis Icin WhatsApp'tan Yazin"
+    },
+    "pinned_story": {
+      "wordmark": "Bereket Firin",
+      "moments": [
+        {
+          "label": "Ekmekler",
+          "photo": "assets/pinned-story/ekmekler.jpg",
+          "narrative": "Her sabah taze hamurdan, geleneksel tas firinda pisirilir."
+        },
+        {
+          "label": "Poglar ve Borekler",
+          "photo": "assets/pinned-story/poaca-borek.jpg",
+          "narrative": "Gunluk taze harc, el acmasi yufka."
+        },
+        {
+          "label": "Pastalar",
+          "photo": "assets/pinned-story/pastalar.jpg",
+          "narrative": "Ozel gunleriniz icin siparis uzerine hazirlanir."
+        },
+        {
+          "label": "Kurabiyeler",
+          "photo": "assets/pinned-story/kurabiyeler.jpg",
+          "narrative": "Tereyagli, katkisiz, gunluk taze kurabiye cesitleri."
+        }
+      ]
+    }
+  },
+  "media": {
+    "customer_photos": [
+      "assets/customer/gida-1-1.jpg",
+      "assets/customer/gida-1-2.jpg"
+    ],
+    "product_photos": []
+  },
+  "seo": {
+    "meta_title": "Bereket Firin | Ankara Firin ve Pastane",
+    "meta_description": "Ankara'da gunluk taze ekmek, pasta ve tatli uretimi. Toplu siparis ve ozel gun pastalari.",
+    "target_keywords": [
+      "Ankara firin",
+      "Ankara pastane",
+      "taze ekmek siparisi"
+    ],
+    "og_image": "assets/og-image.jpg"
+  },
+  "deploy": {
+    "subdomain": "ornekler.arkintelligencelabs.com/gida-icecek-1-firin",
+    "status": "draft"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "site_id": "showcase-oto-3",
+  "tier": "A",
+  "business": {
+    "name": "Netice Ekspertiz",
+    "sector_code": "45.1",
+    "sector_name": "Arac ekspertiz merkezi",
+    "city": "Bursa",
+    "address": "Ornek Mah. Ornek Cad. No:3, Bursa",
+    "phone": "+905000000003",
+    "whatsapp": "+905000000003",
+    "instagram": "@neticeekspertiz",
+    "email": "info@neticeekspertiz.example"
+  },
+  "design": {
+    "primary_color": "#0F2A3D",
+    "secondary_color": "#2FBF71",
+    "font_heading": "Poppins",
+    "font_body": "Inter"
+  },
+  "sections": {
+    "hero": {
+      "headline": "Aracinizi Almadan Once 120 Noktada Kontrol Edelim",
+      "subheadline": "Tam donanimli ekspertiz merkezinde 30 dakikada detayli rapor",
+      "video_asset": "assets/hero-frames/",
+      "frame_count": 120
+    },
+    "services_grid": {
+      "items": [
+        {
+          "title": "120 Nokta Ekspertiz",
+          "description": "Boya, gövde, motor ve sase detayli kontrol",
+          "icon": "search"
+        },
+        {
+          "title": "Ani Randevu",
+          "description": "Ayni gun icinde randevu ve rapor teslimi",
+          "icon": "clock"
+        },
+        {
+          "title": "Dijital Rapor",
+          "description": "Fotografli, aciklamali dijital ekspertiz raporu",
+          "icon": "document"
+        }
+      ]
+    },
+    "animation_2": {
+      "video_asset": "assets/showcase-frames/",
+      "frame_count": 120
+    },
+    "social_proof": {
+      "testimonials": [
+        {
+          "author": "Ornek Musteri",
+          "text": "Rapor sayesinde gizli hasari onceden fark ettim, tesekkurler.",
+          "rating": 5
+        }
+      ],
+      "photos": []
+    },
+    "contact": {
+      "map_embed": "https://maps.google.com/embed?example",
+      "hours": "Her gun 08:00-20:00",
+      "cta_text": "Hemen Randevu Al"
+    }
+  },
+  "media": {
+    "customer_photos": [
+      "assets/customer/oto-3-1.jpg",
+      "assets/customer/oto-3-2.jpg"
+    ],
+    "product_photos": []
+  },
+  "seo": {
+    "meta_title": "Netice Ekspertiz | Bursa Arac Ekspertiz Merkezi",
+    "meta_description": "Bursa'da 120 nokta detayli arac ekspertiz hizmeti. Ayni gun randevu, dijital fotografli rapor.",
+    "target_keywords": [
+      "Bursa arac ekspertiz",
+      "Bursa ekspertiz merkezi",
+      "ikinci el arac kontrol"
+    ],
+    "og_image": "assets/og-image.jpg"
+  },
+  "deploy": {
+    "subdomain": "ornekler.arkintelligencelabs.com/otomotiv-3-ekspertiz",
+    "status": "draft"
+  }
+}
