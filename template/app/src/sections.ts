@@ -4,24 +4,35 @@
 
 import type { SiteConfig } from "./config";
 import { createCanvasFrameSequence } from "./canvas-frame-sequence";
+import { createPinnedStorySection } from "./pinned-story-section";
 
 export function renderHero(root: HTMLElement, config: SiteConfig) {
+  const hero = config.sections.hero;
   const section = document.createElement("section");
   section.className = "ark-section ark-hero";
+
+  const mediaHtml = hero.video_asset
+    ? `<div class="ark-hero-frames"></div>`
+    : `<div class="ark-hero-static" style="background-image:url(${escapeHtml(hero.image ?? "")})"></div>`;
+
   section.innerHTML = `
-    <div class="ark-hero-frames"></div>
+    ${mediaHtml}
     <div class="ark-hero-copy">
-      <h1>${escapeHtml(config.sections.hero.headline)}</h1>
-      ${config.sections.hero.subheadline ? `<p>${escapeHtml(config.sections.hero.subheadline)}</p>` : ""}
+      <h1>${escapeHtml(hero.headline)}</h1>
+      ${hero.subheadline ? `<p>${escapeHtml(hero.subheadline)}</p>` : ""}
     </div>
   `;
   root.appendChild(section);
 
-  createCanvasFrameSequence({
-    container: section.querySelector(".ark-hero-frames") as HTMLElement,
-    framesPath: config.sections.hero.video_asset,
-    frameCount: config.sections.hero.frame_count,
-  });
+  // B tier: Kling videosu yok, sadece statik hero.image + CSS Ken Burns/fade
+  // (bkz. style.css .ark-hero-static). A/S/S+ tier: Kling kare-dizisi.
+  if (hero.video_asset && hero.frame_count) {
+    createCanvasFrameSequence({
+      container: section.querySelector(".ark-hero-frames") as HTMLElement,
+      framesPath: hero.video_asset,
+      frameCount: hero.frame_count,
+    });
+  }
 }
 
 export function renderServicesGrid(root: HTMLElement, config: SiteConfig) {
@@ -31,6 +42,14 @@ export function renderServicesGrid(root: HTMLElement, config: SiteConfig) {
     .map(
       (item) => `
         <div class="ark-service-card">
+          ${
+            item.photo
+              ? `<div class="ark-service-media">
+                   <img class="ark-service-photo" src="${escapeHtml(item.photo)}" alt="${escapeHtml(item.title)}" loading="lazy" />
+                   ${item.hover_clip ? `<video class="ark-service-clip" src="${escapeHtml(item.hover_clip)}" muted loop playsinline preload="none"></video>` : ""}
+                 </div>`
+              : ""
+          }
           <h3>${escapeHtml(item.title)}</h3>
           ${item.description ? `<p>${escapeHtml(item.description)}</p>` : ""}
         </div>`,
@@ -38,9 +57,30 @@ export function renderServicesGrid(root: HTMLElement, config: SiteConfig) {
     .join("");
   section.innerHTML = `<div class="ark-services-grid">${items}</div>`;
   root.appendChild(section);
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reducedMotion) {
+    section.querySelectorAll<HTMLElement>(".ark-service-media").forEach((media) => {
+      const clip = media.querySelector("video") as HTMLVideoElement | null;
+      if (!clip) return;
+      media.addEventListener("mouseenter", () => {
+        clip.currentTime = 0;
+        clip.play().catch(() => {});
+        media.classList.add("is-playing");
+      });
+      media.addEventListener("mouseleave", () => {
+        clip.pause();
+        media.classList.remove("is-playing");
+      });
+    });
+  }
 }
 
 export function renderAnimation2(root: HTMLElement, config: SiteConfig) {
+  // B tier'de bu bolum hic yok (Kling videosu uretilmiyor) - opsiyonel.
+  const animation2 = config.sections.animation_2;
+  if (!animation2) return;
+
   const section = document.createElement("section");
   section.className = "ark-section ark-animation2";
   section.innerHTML = `<div class="ark-animation2-frames"></div>`;
@@ -48,8 +88,8 @@ export function renderAnimation2(root: HTMLElement, config: SiteConfig) {
 
   createCanvasFrameSequence({
     container: section.querySelector(".ark-animation2-frames") as HTMLElement,
-    framesPath: config.sections.animation_2.video_asset,
-    frameCount: config.sections.animation_2.frame_count,
+    framesPath: animation2.video_asset,
+    frameCount: animation2.frame_count,
   });
 }
 
@@ -82,17 +122,40 @@ export function renderContact(root: HTMLElement, config: SiteConfig) {
   root.appendChild(section);
 }
 
+export function renderPinnedStory(root: HTMLElement, config: SiteConfig) {
+  const pinnedStory = config.sections.pinned_story;
+  if (!pinnedStory) return;
+
+  const section = document.createElement("section");
+  section.className = "ark-section ark-pinned-story";
+  root.appendChild(section);
+
+  createPinnedStorySection({
+    container: section,
+    wordmark: pinnedStory.wordmark,
+    moments: pinnedStory.moments,
+  });
+}
+
 export function renderSite(root: HTMLElement, config: SiteConfig) {
   document.title = config.seo.meta_title;
   renderHero(root, config);
   renderServicesGrid(root, config);
   renderAnimation2(root, config);
+  renderPinnedStory(root, config);
   renderSocialProof(root, config);
   renderContact(root, config);
 }
 
-function escapeHtml(s: string): string {
-  const div = document.createElement("div");
-  div.textContent = s;
-  return div.innerHTML;
+export function escapeHtml(s: string): string {
+  // div.textContent+innerHTML yontemi SADECE &<> kacisini yapar - " ve '
+  // kacmadigi icin bu deger bir HTML ATTRIBUTE icine konunca (src="...",
+  // style="...") tirnak-kirma/enjeksiyon riski olusuyordu. Manuel replace
+  // ile 5 karakterin tamami kaciriliyor (guvenli-kod kural 9).
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }

@@ -5,11 +5,19 @@ Sadece ilk 20 sektordeki (weight=1.0) isletmeler degerlendirilir.
 lead_score = zayiflik sinyali (sitesi yok/kotu = yuksek firsat) agirlikli
 + buyukluk sinyali (yorum sayisi = gercek/aktif isletme gostergesi).
 
-Esikler: 80+ Tier A, 60-79 Tier B, altinda Tier C.
-Tahmini anlasma degeri s3-9'daki gercek fiyat kademelerine gore (3D Web
-Sitesi 12.000 TL, 7D Web Sitesi 24.000 TL) tier basina KARISIK/beklenen
-deger olarak atanir - hangi musterinin 3D mi 7D mi alacagi konusma
-sirasinda belli oldugu icin bu bir tahmindir, kesin deger degil.
+Esikler: 80+ "eski_sistem", 60-79 "ortalama", altinda "iyi".
+
+(2026-07-19: harf-tabanli Tier A/B/C isimleri KALKTI - website urun tier'i
+olan B/A/S/S+ ile karisiyordu. Yeni isimler musterinin MEVCUT durumunu
+tanimliyor: "eski_sistem" = su anki sitesi/sistemi eski-kotu (= bizim icin
+EN YUKSEK firsat), "ortalama" = orta, "iyi" = su anki sitesi zaten iyi
+(= bizim icin EN DUSUK firsat, muhtemelen satmasi en zor grup).)
+
+Tahmini anlasma degeri s3-9'daki gercek fiyat kademelerine gore (2026-07-19
+itibariyla B=10-15k/A=15-20k/S=20-25k/S+=25-45k TL, eski 3D/7D isimleri
+kalkti) lead-tier basina KARISIK/beklenen deger olarak atanir - hangi
+musterinin hangi website tier'ini (B/A/S/S+) alacagi konusma sirasinda
+belli oldugu icin bu bir tahmindir, kesin deger degil.
 """
 
 import os
@@ -21,17 +29,20 @@ from supabase import create_client
 ROOT = Path(__file__).parent.parent.parent
 load_dotenv(ROOT / "litellm" / ".env")
 
-# Tier A: en yuksek firsatli isletmeler, 7D'ye (24k) daha yatkin beklenir.
-# Tier C: butce hassasiyeti daha yuksek, 3D'ye (12k) daha yatkin beklenir.
-DEFAULT_DEAL_VALUE = {"A": 24000, "B": 18000, "C": 12000}
+# "eski_sistem": en yuksek firsatli isletmeler (su anki siteleri kotu/yok),
+# ust website tier'lerine (S/S+) daha yatkin beklenir. "iyi": butce
+# hassasiyeti daha yuksek gruptan cok, zaten iyi bir sitesi olan grup -
+# satmasi en zor, alt website tier'lerine (B/A) daha yatkin beklenir.
+# (2026-07-19: B/A/S/S+ fiyat araliklarinin orta noktalarina gore guncellendi.)
+DEFAULT_DEAL_VALUE = {"eski_sistem": 30000, "ortalama": 20000, "iyi": 13000}
 
 
 def tier_for(score: float) -> str:
     if score >= 80:
-        return "A"
+        return "eski_sistem"
     if score >= 60:
-        return "B"
-    return "C"
+        return "ortalama"
+    return "iyi"
 
 
 def main() -> None:
@@ -78,7 +89,7 @@ def main() -> None:
         )
     audit_by_business = {a["business_id"]: a for a in audits_raw}
 
-    counts = {"A": 0, "B": 0, "C": 0}
+    counts = {"eski_sistem": 0, "ortalama": 0, "iyi": 0}
     rows_to_insert = []
 
     for biz in businesses:

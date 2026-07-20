@@ -1,6 +1,6 @@
 {
   "site_id": "00000000-0000-0000-0000-000000000000",
-  "tier": "3D",
+  "tier": "A",
   "business": {
     "name": "Ornek Oto Galeri",
     "sector_code": "45.1",
@@ -49,7 +49,7 @@
     }
   },
   "media": {
-    "customer_photos": [],
+    "customer_photos": ["assets/customer/isyeri-1.jpg", "assets/customer/isyeri-2.jpg"],
     "product_photos": []
   },
   "seo": {

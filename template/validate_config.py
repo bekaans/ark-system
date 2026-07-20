@@ -16,16 +16,18 @@ from pathlib import Path
 REQUIRED = {
     "": ["site_id", "tier", "business", "sections", "seo", "deploy"],
     "business": ["name", "sector_code", "sector_name", "city", "phone"],
-    "sections": ["hero", "services_grid", "animation_2", "social_proof", "contact"],
-    "sections.hero": ["headline", "video_asset", "frame_count"],
+    "sections": ["hero", "services_grid", "social_proof", "contact"],
+    "sections.hero": ["headline"],
     "sections.services_grid": ["items"],
-    "sections.animation_2": ["video_asset", "frame_count"],
     "sections.contact": ["cta_text"],
     "seo": ["meta_title", "meta_description", "target_keywords"],
     "deploy": ["subdomain", "status"],
 }
 
-VALID_TIER = {"3D", "7D"}
+# Tier isimleri 2026-07-19'da B/A/S/S+ olarak degistirildi (eski 3D->A, 7D->S,
+# hover+pinned_story tier'i S->S+). B tier YENI: Kling video hic uretilmiyor,
+# statik/CSS animasyonlu duz site - bkz README.md tier yeniden adlandirma notu.
+VALID_TIER = {"B", "A", "S", "S+"}
 VALID_STATUS = {"draft", "review", "live"}
 
 
@@ -56,16 +58,52 @@ def validate(config: dict) -> list[str]:
 
     tier = config.get("tier")
     if tier is not None and tier not in VALID_TIER:
-        errors.append(f"gecersiz tier: '{tier}' (beklenen: 3D veya 7D)")
+        errors.append(f"gecersiz tier: '{tier}' (beklenen: B, A, S veya S+)")
 
     status = get_nested(config, "deploy.status") if get_nested(config, "deploy") else None
     if status is not None and status not in VALID_STATUS:
         errors.append(f"gecersiz deploy.status: '{status}' (beklenen: draft/review/live)")
 
-    if tier == "7D":
-        photos = get_nested(config, "media.customer_photos") or []
-        if not photos:
-            errors.append("7D tier icin media.customer_photos bos olamaz")
+    # B tier: Kling videosu YOK - hero.image zorunlu, video_asset/animation_2 kullanilmaz.
+    # A/S/S+ tier: hero.video_asset+frame_count VE sections.animation_2 zorunlu (Kling uretimi).
+    hero = get_nested(config, "sections.hero") or {}
+    if tier == "B":
+        if not hero.get("image"):
+            errors.append("B tier icin sections.hero.image zorunlu (video_asset degil)")
+    elif tier in ("A", "S", "S+"):
+        if not hero.get("video_asset") or not hero.get("frame_count"):
+            errors.append(f"{tier} tier icin sections.hero.video_asset ve frame_count zorunlu")
+        animation_2 = get_nested(config, "sections.animation_2")
+        if animation_2 is None:
+            errors.append(f"{tier} tier icin sections.animation_2 zorunlu")
+        elif not animation_2.get("video_asset") or not animation_2.get("frame_count"):
+            errors.append(f"{tier} tier icin sections.animation_2.video_asset ve frame_count zorunlu")
+
+    # HER tier musterinin KENDI fotograflarini kullanir (2026-07-19 duzeltmesi:
+    # sektor-bazli jenerik/stok icerik YOK artik). Fark, o fotograflara ne kadar
+    # animasyon/efekt uygulandiginda: B=duz foto, A=kisa Kling girisi,
+    # S=tam Kling video hero, S+=S + hover/pinned_story/tum efektler.
+    photos = get_nested(config, "media.customer_photos") or []
+    if not photos:
+        errors.append(f"{tier} tier icin media.customer_photos bos olamaz (artik her tier musteri fotografi kullanir)")
+
+    # S+ tier: S'in ustune hero-hover-pinned_story tam paketi (eski "S").
+    if tier == "S+":
+        if get_nested(config, "sections.pinned_story") is None:
+            errors.append("S+ tier icin sections.pinned_story zorunlu")
+
+    pinned_story = get_nested(config, "sections.pinned_story")
+    if pinned_story is not None:
+        if not pinned_story.get("wordmark"):
+            errors.append("eksik/boş alan: 'sections.pinned_story.wordmark'")
+        moments = pinned_story.get("moments") or []
+        if len(moments) < 2:
+            errors.append("sections.pinned_story.moments en az 2 oge icermeli")
+        for i, moment in enumerate(moments):
+            if not moment.get("label"):
+                errors.append(f"eksik/boş alan: 'sections.pinned_story.moments[{i}].label'")
+            if not moment.get("photo"):
+                errors.append(f"eksik/boş alan: 'sections.pinned_story.moments[{i}].photo'")
 
     return errors
 

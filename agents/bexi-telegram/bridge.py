@@ -22,14 +22,24 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-BOT_TOKEN = "8958074022:AAGXVpeurvzYIHyTaAe_Fw1H_-K7kWJMcns"
-CHAT_ID = "7646334437"
 ARK_DIR = Path.home() / "ark-system"
 BRIDGE_DIR = ARK_DIR / "agents" / "bexi-telegram"
 OFFSET_FILE = BRIDGE_DIR / ".offset"
 HISTORY_FILE = BRIDGE_DIR / "history.jsonl"
 PID_FILE = BRIDGE_DIR / ".pid"
 MAX_HISTORY = 10  # son kac mesaj tutulacak (kisa-sureli hafiza, cift sayida iyi olur)
+
+
+def _read_env(key: str) -> str:
+    env_path = ARK_DIR / "litellm" / ".env"
+    for line in env_path.read_text().splitlines():
+        if line.startswith(f"{key}="):
+            return line.split("=", 1)[1].strip()
+    return ""
+
+
+BOT_TOKEN = _read_env("TELEGRAM_BOT_TOKEN")
+CHAT_ID = _read_env("TELEGRAM_CHAT_ID")
 
 
 def acquire_lock() -> None:
@@ -107,14 +117,6 @@ def ask_claude(prompt: str) -> str:
     return result.stdout.strip() or result.stderr.strip() or "(bos cevap)"
 
 
-def _read_env(key: str) -> str:
-    env_path = ARK_DIR / "litellm" / ".env"
-    for line in env_path.read_text().splitlines():
-        if line.startswith(f"{key}="):
-            return line.split("=", 1)[1].strip()
-    return ""
-
-
 def _supabase_count(table: str, filter_qs: str = "") -> int:
     url = _read_env("SUPABASE_URL")
     key = _read_env("SUPABASE_SECRET_KEY")
@@ -140,10 +142,10 @@ def generate_agent_status() -> str:
         businesses = _supabase_count("businesses")
         leads = _supabase_count("leads")
         convos = _supabase_count("conversations")
-        tier_s = _supabase_count("leads", "sales_tier=eq.S")
-        tier_a = _supabase_count("leads", "sales_tier=eq.A")
-        tier_b = _supabase_count("leads", "sales_tier=eq.B")
-        tier_d = _supabase_count("leads", "sales_tier=eq.D")
+        tier_pm = _supabase_count("leads", "sales_tier=eq.potansiyel_musteri")
+        tier_po = _supabase_count("leads", "sales_tier=eq.potansiyel_olabilir")
+        tier_ss = _supabase_count("leads", "sales_tier=eq.soguk_satis")
+        tier_sm = _supabase_count("leads", "sales_tier=eq.sadece_merak")
     except Exception as exc:
         return f"Durum sorgulanamadi: {exc}"
 
@@ -153,8 +155,9 @@ def generate_agent_status() -> str:
     if convos == 0:
         lines.append("dm-qualifier: henuz kimseyle konusmadi (WhatsApp/Chatwoot baglantisi bekliyor - s3-1/s3-2)")
     else:
-        lines.append(f"dm-qualifier: {convos} mesaj, {tier_s} satisa donuk (S), {tier_a} randevu asamasinda (A), "
-                      f"{tier_b} isitilmaya calisiliyor (B), {tier_d} soguk/sessiz (D)")
+        lines.append(f"dm-qualifier: {convos} mesaj, {tier_pm} satisa donuk (potansiyel musteri), "
+                      f"{tier_po} randevu asamasinda (potansiyel olabilir), "
+                      f"{tier_ss} isitilmaya calisiliyor (soguk satis), {tier_sm} soguk/sessiz (sadece merak)")
     return "\n".join(lines)
 
 

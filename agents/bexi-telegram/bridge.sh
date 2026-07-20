@@ -12,13 +12,14 @@
 
 set -u
 
-BOT_TOKEN="8958074022:AAGXVpeurvzYIHyTaAe_Fw1H_-K7kWJMcns"
-CHAT_ID="7646334437"
 ARK_DIR="$HOME/ark-system"
 BRIDGE_DIR="$ARK_DIR/agents/bexi-telegram"
 OFFSET_FILE="$BRIDGE_DIR/.offset"
 PID_FILE="$BRIDGE_DIR/.pid"
 PY="${LAST30DAYS_PYTHON:-python3}"
+ENV_FILE="$ARK_DIR/litellm/.env"
+BOT_TOKEN="$(grep '^TELEGRAM_BOT_TOKEN=' "$ENV_FILE" | cut -d= -f2-)"
+CHAT_ID="$(grep '^TELEGRAM_CHAT_ID=' "$ENV_FILE" | cut -d= -f2-)"
 
 mkdir -p "$BRIDGE_DIR"
 [ -f "$OFFSET_FILE" ] || echo 0 > "$OFFSET_FILE"

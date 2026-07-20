@@ -48,7 +48,7 @@ def main() -> None:
     for lead in flagged:
         biz = supabase.table("businesses").select("name").eq("id", lead["business_id"]).single().execute().data
         sector = supabase.table("sectors").select("name").eq("id", lead["sector_id"]).single().execute().data
-        print(f"[{lead['id'][:8]}] {biz['name']} — {sector['name']} (Tier {lead['tier']})")
+        print(f"[{lead['id'][:8]}] {biz['name']} — {sector['name']} ({lead['tier']})")
 
     print(f"\nOnaylamak istediklerinin ID'lerini (koseli parantez icindeki kisa kod) soyle.")
 

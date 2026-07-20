@@ -1,12 +1,13 @@
 """
-ARK - Ajan 1, gorev 14: Tier A ilk mesaj taslaklari.
+ARK - Ajan 1, gorev 14: eski_sistem lead'leri icin ilk mesaj taslaklari.
 
 cold-email skill'inin ilkelerini (akran gibi yaz, kisiselestirme bulguya
 baglansin, tek istek, kisa tut) WhatsApp/Instagram DM formatina uyarlayip
 Ajan 1'in LLM zinciriyle (Cerebras) taslak uretir.
 
-Once ilk 10 Tier A lead icin calisir (checklist kurali: "Ilk 10 mesaji
-elden gecir - ton senin sesin olsun").
+Once ilk 10 "eski_sistem" (en yuksek firsatli, eski Tier A) lead icin
+calisir (checklist kurali: "Ilk 10 mesaji elden gecir - ton senin sesin
+olsun").
 """
 
 import os
@@ -21,7 +22,7 @@ ROOT = Path(__file__).parent.parent.parent
 load_dotenv(ROOT / "litellm" / ".env")
 
 PROMPT_TEMPLATE = """Sen ARK Intelligence Labs adli bir ajans icin WhatsApp/Instagram DM taslagi yaziyorsun.
-Ajans, yerel isletmelere modern, 3D-animasyonlu web siteleri kuruyor.
+Ajans, yerel isletmelere modern, animasyonlu web siteleri kuruyor.
 
 Ilkeler (cold-email skill'inden uyarlanmis):
 - Akran gibi yaz, satici gibi degil. Bir arkadasin baska bir isletme sahibine
@@ -78,13 +79,13 @@ def main() -> None:
     leads = (
         supabase.table("leads")
         .select("id,business_id,sector_id")
-        .eq("tier", "A")
+        .eq("tier", "eski_sistem")
         .is_("outreach_draft", "null")
         .limit(10)
         .execute()
         .data
     )
-    print(f"[ARK] {len(leads)} Tier A lead icin taslak yazilacak (ilk 10).")
+    print(f"[ARK] {len(leads)} 'eski_sistem' lead icin taslak yazilacak (ilk 10).")
 
     for lead in leads:
         biz = supabase.table("businesses").select("name,website").eq("id", lead["business_id"]).single().execute().data

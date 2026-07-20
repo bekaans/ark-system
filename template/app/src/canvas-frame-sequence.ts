@@ -61,7 +61,7 @@ export function createCanvasFrameSequence(options: FrameSequenceOptions): {
     ctx.font = `${Math.max(canvas.width * 0.04, 16)}px sans-serif`;
     ctx.textAlign = "center";
     ctx.fillText(
-      `frame ${i + 1}/${frameCount} (placeholder - Higgsfield karesi bekleniyor)`,
+      `frame ${i + 1}/${frameCount} (placeholder - Kling karesi bekleniyor)`,
       canvas.width / 2,
       canvas.height / 2,
     );
@@ -78,7 +78,7 @@ export function createCanvasFrameSequence(options: FrameSequenceOptions): {
     ctx.drawImage(images[i], 0, 0, canvas.width, canvas.height);
   }
 
-  // Kareleri onceden yukle. Herhangi biri 404 verirse (gercek Higgsfield
+  // Kareleri onceden yukle. Herhangi biri 404 verirse (gercek Kling
   // kareleri henuz uretilmediyse) placeholder moduna dus - sessizce cokme.
   for (let i = 0; i < frameCount; i++) {
     const img = new Image();

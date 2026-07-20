@@ -49,16 +49,16 @@ create table if not exists leads (
   business_id uuid references businesses(id) not null unique,  -- score_leads.py upsert(on_conflict="business_id") icin sart
   sector_id uuid references sectors(id),
   lead_score numeric,
-  tier text check (tier in ('A', 'B', 'C')),        -- on-satis: isletme/firsat degeri tier'i
+  tier text check (tier in ('eski_sistem', 'ortalama', 'iyi')),        -- on-satis: isletme/firsat degeri tier'i (2026-07-19: eski A/B/C harfleri website tier'iyla (B/A/S/S+) karisiyordu, tanimlayici isimlere gecildi)
   estimated_deal_value numeric,
   status text not null default 'new'
-    check (status in ('new','contacted','qualified','meeting','proposal','won','lost')),
+    check (status in ('new','contacted','qualified','meeting','proposal','won','lost','flagged')),  -- flagged: flag_inappropriate.py'nin uygunsuz isaretledigi lead'ler (kullanici onayi bekler)
   outreach_draft text,
   -- dm-qualifier yanit gecikme durumu (mirroring - musteri hizina gore ayarlanir)
   response_stage int not null default 1,             -- 1=60-90sn, 2=stage1-20sn, 3=10-15sn
   last_delay_seconds numeric,
   -- sohbet-ici satisa-gecme tier'i (leads.tier'den BAGIMSIZ, konusma ilerledikce guncellenir)
-  sales_tier text check (sales_tier in ('S','A','B','C','D')),  -- S = satis/kapanis
+  sales_tier text check (sales_tier in ('sadece_merak','kararsiz','soguk_satis','potansiyel_olabilir','potansiyel_musteri')),  -- potansiyel_musteri = satis/kapanis (2026-07-19: eski S/A/B/C/D harfleri website tier'iyla karisiyordu)
   sales_tier_score numeric,
   -- SEO 2.0 "ilk ay ucretsiz" hediyesi bir musteriye SADECE BIR KEZ verilir
   seo_gift_given boolean not null default false,
@@ -74,7 +74,7 @@ create table if not exists conversations (
   channel text check (channel in ('whatsapp','instagram')),
   direction text check (direction in ('inbound','outbound')),
   message text,
-  token text check (token in ('APPOINTMENT','HUMAN', null)),
+  token text check (token is null or token in ('APPOINTMENT','HUMAN')),  -- IN listesinde null etkisizdi (UNKNOWN sonucu CHECK'i her zaman gecerdi), duzeltildi
   created_at timestamptz not null default now()
 );
 

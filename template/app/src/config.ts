@@ -2,7 +2,7 @@
 
 export interface SiteConfig {
   site_id: string;
-  tier: "3D" | "7D";
+  tier: "B" | "A" | "S" | "S+";
   business: {
     name: string;
     sector_code: string;
@@ -21,14 +21,32 @@ export interface SiteConfig {
     font_body?: string;
   };
   sections: {
-    hero: { headline: string; subheadline?: string; video_asset: string; frame_count: number };
-    services_grid: { items: { title: string; description?: string; icon?: string }[] };
-    animation_2: { video_asset: string; frame_count: number };
+    hero: {
+      headline: string;
+      subheadline?: string;
+      video_asset?: string;
+      frame_count?: number;
+      image?: string;
+    };
+    services_grid: {
+      items: {
+        title: string;
+        description?: string;
+        icon?: string;
+        photo?: string;
+        hover_clip?: string;
+      }[];
+    };
+    animation_2?: { video_asset: string; frame_count: number };
     social_proof: {
       testimonials?: { author?: string; text?: string; rating?: number }[];
       photos?: string[];
     };
     contact: { map_embed?: string; hours?: string; cta_text: string };
+    pinned_story?: {
+      wordmark: string;
+      moments: { label: string; photo: string; narrative?: string }[];
+    };
   };
   media?: { customer_photos?: string[]; product_photos?: string[] };
   seo: {
