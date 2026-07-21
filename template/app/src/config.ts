@@ -2,7 +2,7 @@
 
 export interface SiteConfig {
   site_id: string;
-  tier: "B" | "A" | "S" | "S+";
+  tier: "C" | "B" | "A" | "S" | "S+";
   business: {
     name: string;
     sector_code: string;
@@ -19,6 +19,7 @@ export interface SiteConfig {
     secondary_color?: string;
     font_heading?: string;
     font_body?: string;
+    landing_variant?: "classic-01";
   };
   sections: {
     hero: {
@@ -27,6 +28,12 @@ export interface SiteConfig {
       video_asset?: string;
       frame_count?: number;
       image?: string;
+      webgl_scene?: {
+        preset: "video-showcase" | "chrome-ring";
+        video_asset?: string; // preset=video-showcase icin zorunlu
+        accent_color?: string;
+        fallback_image: string;
+      };
     };
     services_grid: {
       items: {

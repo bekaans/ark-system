@@ -22,8 +22,12 @@
     "hero": {
       "headline": "Her Sabah Taze Firindan Sofraniza",
       "subheadline": "Geleneksel tarif, gunluk taze uretim",
-      "video_asset": "assets/hero-frames/",
-      "frame_count": 120
+      "webgl_scene": {
+        "preset": "video-showcase",
+        "video_asset": "assets/hero-video/clip.mp4",
+        "accent_color": "#E8A33D",
+        "fallback_image": "assets/customer/gida-1-1.jpg"
+      }
     },
     "services_grid": {
       "items": [

@@ -1,0 +1,190 @@
+/* ARK - C tier "classic modern landing" varyanti #1.
+   template/app/DESIGN.md kurallarina uyar (Signal Rule, pill butonlar,
+   card-rest/card-hover golge cifti, gradient text/eyebrow etiket yasagi) -
+   ama tam sayfa scroll-pin/motion YOK, klasik akan (flowing) bir duzen. */
+
+.ark-classic {
+  font-family: var(--ark-font-body);
+  color: var(--ark-primary);
+  background: #fff;
+}
+
+.ark-classic-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.ark-classic-brand {
+  font-family: var(--ark-font-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.ark-classic-nav-cta {
+  display: inline-block;
+  background: var(--ark-secondary);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: 999px;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s;
+}
+
+.ark-classic-nav-cta:hover {
+  transform: scale(1.04);
+}
+
+.ark-classic-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+@media (min-width: 800px) {
+  .ark-classic-hero {
+    grid-template-columns: 1.1fr 1fr;
+    padding: 6rem 2rem;
+  }
+}
+
+.ark-classic-hero-copy h1 {
+  font-family: var(--ark-font-heading);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.15;
+}
+
+.ark-classic-hero-copy p {
+  margin-top: 1rem;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  color: rgba(29, 29, 31, 0.75);
+}
+
+.ark-classic-hero-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.ark-classic-cta {
+  display: inline-block;
+  margin-top: 1.75rem;
+  background: var(--ark-secondary);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.9rem 2rem;
+  border-radius: 999px;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background 0.2s;
+}
+
+.ark-classic-cta:hover {
+  transform: scale(1.04);
+}
+
+.ark-classic-cta:focus-visible,
+.ark-classic-nav-cta:focus-visible {
+  outline: 2px solid var(--ark-primary);
+  outline-offset: 2px;
+}
+
+.ark-classic-services {
+  background: #fafafc;
+  padding: 4rem 1.5rem;
+}
+
+.ark-classic-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.ark-classic-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.ark-classic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.ark-classic-card-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.ark-classic-card h3 {
+  font-family: var(--ark-font-heading);
+  margin-bottom: 0.5rem;
+}
+
+.ark-classic-card p {
+  color: rgba(29, 29, 31, 0.75);
+}
+
+.ark-classic-testimonials {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+.ark-classic-testimonials blockquote {
+  font-style: italic;
+  font-size: 1.15rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.ark-classic-testimonials cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ark-secondary);
+}
+
+.ark-classic-contact {
+  background: var(--ark-primary);
+  color: #fff;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ark-classic-contact h2 {
+  font-family: var(--ark-font-heading);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.ark-classic-contact .ark-classic-cta {
+  margin-top: 1rem;
+}

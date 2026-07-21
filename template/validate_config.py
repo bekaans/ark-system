@@ -27,7 +27,9 @@ REQUIRED = {
 # Tier isimleri 2026-07-19'da B/A/S/S+ olarak degistirildi (eski 3D->A, 7D->S,
 # hover+pinned_story tier'i S->S+). B tier YENI: Kling video hic uretilmiyor,
 # statik/CSS animasyonlu duz site - bkz README.md tier yeniden adlandirma notu.
-VALID_TIER = {"B", "A", "S", "S+"}
+# 2026-07-21: C tier (sabit landing sablonu) eklendi, S/S+ icin gercek WebGL
+# eklendi (S=sadece WebGL/GSAP yok, S+=WebGL+GSAP koreografili) - bkz README.md.
+VALID_TIER = {"C", "B", "A", "S", "S+"}
 VALID_STATUS = {"draft", "review", "live"}
 
 
@@ -58,19 +60,29 @@ def validate(config: dict) -> list[str]:
 
     tier = config.get("tier")
     if tier is not None and tier not in VALID_TIER:
-        errors.append(f"gecersiz tier: '{tier}' (beklenen: B, A, S veya S+)")
+        errors.append(f"gecersiz tier: '{tier}' (beklenen: C, B, A, S veya S+)")
 
     status = get_nested(config, "deploy.status") if get_nested(config, "deploy") else None
     if status is not None and status not in VALID_STATUS:
         errors.append(f"gecersiz deploy.status: '{status}' (beklenen: draft/review/live)")
 
-    # B tier: Kling videosu YOK - hero.image zorunlu, video_asset/animation_2 kullanilmaz.
-    # A/S/S+ tier: hero.video_asset+frame_count VE sections.animation_2 zorunlu (Kling uretimi).
+    # Motion-tech merdiveni (ucuzdan pahaliya, her tier bir oncekinin ustune TAM
+    # OLARAK bir teknoloji ekler - 2026-07-21):
+    # C: Kling/WebGL yok - hero.image + design.landing_variant zorunlu.
+    # B: Kling videosu YOK - hero.image zorunlu, video_asset/animation_2 kullanilmaz.
+    # A ("eski kompozisyon"): hero.video_asset+frame_count VE animation_2 zorunlu (Kling+GSAP).
+    # S (sadece WebGL, GSAP YOK): hero.webgl_scene zorunlu, video_asset/animation_2 KULLANILAMAZ.
+    # S+ (WebGL+GSAP): hero.webgl_scene zorunlu + animation_2 zorunlu + pinned_story zorunlu.
     hero = get_nested(config, "sections.hero") or {}
-    if tier == "B":
+    if tier == "C":
+        if not hero.get("image"):
+            errors.append("C tier icin sections.hero.image zorunlu")
+        if not get_nested(config, "design.landing_variant"):
+            errors.append("C tier icin design.landing_variant zorunlu")
+    elif tier == "B":
         if not hero.get("image"):
             errors.append("B tier icin sections.hero.image zorunlu (video_asset degil)")
-    elif tier in ("A", "S", "S+"):
+    elif tier == "A":
         if not hero.get("video_asset") or not hero.get("frame_count"):
             errors.append(f"{tier} tier icin sections.hero.video_asset ve frame_count zorunlu")
         animation_2 = get_nested(config, "sections.animation_2")
@@ -78,11 +90,36 @@ def validate(config: dict) -> list[str]:
             errors.append(f"{tier} tier icin sections.animation_2 zorunlu")
         elif not animation_2.get("video_asset") or not animation_2.get("frame_count"):
             errors.append(f"{tier} tier icin sections.animation_2.video_asset ve frame_count zorunlu")
+    elif tier in ("S", "S+"):
+        webgl_scene = hero.get("webgl_scene")
+        if not webgl_scene:
+            errors.append(f"{tier} tier icin sections.hero.webgl_scene zorunlu")
+        else:
+            preset = webgl_scene.get("preset")
+            if not preset:
+                errors.append(f"{tier} tier icin sections.hero.webgl_scene.preset zorunlu")
+            elif preset not in ("video-showcase", "chrome-ring"):
+                errors.append(f"gecersiz sections.hero.webgl_scene.preset: '{preset}' (beklenen: video-showcase veya chrome-ring)")
+            elif preset == "video-showcase" and not webgl_scene.get("video_asset"):
+                errors.append(f"{tier} tier icin sections.hero.webgl_scene.video_asset zorunlu (preset=video-showcase)")
+            if not webgl_scene.get("fallback_image"):
+                errors.append(f"{tier} tier icin sections.hero.webgl_scene.fallback_image zorunlu")
+        if hero.get("video_asset") or hero.get("frame_count"):
+            errors.append(f"{tier} tier icin sections.hero.video_asset/frame_count kullanilmaz (WebGL kullanilir)")
+
+        animation_2 = get_nested(config, "sections.animation_2")
+        if tier == "S" and animation_2 is not None:
+            errors.append("S tier icin sections.animation_2 kullanilmaz (WebGL-only ilkesi, GSAP yok)")
+        if tier == "S+":
+            if animation_2 is None:
+                errors.append("S+ tier icin sections.animation_2 zorunlu")
+            elif not animation_2.get("video_asset") or not animation_2.get("frame_count"):
+                errors.append("S+ tier icin sections.animation_2.video_asset ve frame_count zorunlu")
 
     # HER tier musterinin KENDI fotograflarini kullanir (2026-07-19 duzeltmesi:
     # sektor-bazli jenerik/stok icerik YOK artik). Fark, o fotograflara ne kadar
-    # animasyon/efekt uygulandiginda: B=duz foto, A=kisa Kling girisi,
-    # S=tam Kling video hero, S+=S + hover/pinned_story/tum efektler.
+    # animasyon/efekt uygulandiginda: C=sabit sablon+duz foto, B=duz foto,
+    # A=kisa Kling girisi, S=WebGL hero, S+=S+WebGL+animation_2/hover/pinned_story.
     photos = get_nested(config, "media.customer_photos") or []
     if not photos:
         errors.append(f"{tier} tier icin media.customer_photos bos olamaz (artik her tier musteri fotografi kullanir)")

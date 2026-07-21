@@ -35,18 +35,23 @@ bağlı hizmetlerin (hosting-bakım, opsiyonel SEO 2.0) koşullarına ilişkindi
 
 Müşteri aşağıdaki tier'lardan birini seçmiştir (işaretleyiniz):
 
+- [ ] **C — En Ekonomik** (fiyat: [_______] TL): Önceden tasarlanmış, klasik/
+  modern bir site şablonu kullanılır; müşterinin kendi fotoğrafı ve bilgileri
+  bu şablona işlenir. Video/hareketli kare dizisi veya 3 boyutlu görsel yoktur.
 - [ ] **B — Giriş Seviyesi** (10.000-15.000 TL): Müşterinin kendi fotoğrafı
   statik olarak yerleştirilir, hafif CSS animasyonları (yavaş yakınlaştırma/
   belirme efekti) uygulanır. Video/hareketli kare dizisi üretimi yoktur.
 - [ ] **A** (15.000-20.000 TL): Müşterinin fotoğrafından kısa bir yapay
   zeka destekli video giriş efekti üretilir.
-- [ ] **S** (20.000-25.000 TL): Müşterinin fotoğraflarından tam bir
-  yapay-zeka-üretimi tanıtım videosu, kaydırma ile deneyimlenen bir "hero"
-  bölümü olarak sunulur.
+- [ ] **S** (20.000-25.000 TL): Müşterinin fotoğraflarından üretilen yapay-
+  zeka videosu, gerçek üç boyutlu (3D) bir görsel sahne içinde derinlik
+  hissiyle sunulur (düz video oynatımından farklı olarak, kaydırma/hareketle
+  birlikte gerçek bir perspektif değişimi yaşanır).
 - [ ] **S+ — En Üst Katman** (25.000-45.000 TL, kapsama göre): S'in tüm
-  özelliklerinin üzerine, fare ile üzerine gelindiğinde canlanan hizmet/ürün
-  kartları ve birden fazla görseli sırayla tanıtan bir katalog/portföy
-  bölümü eklenir.
+  özelliklerinin üzerine, bu üç boyutlu sahne kaydırma hareketiyle daha
+  ileri düzeyde uyumlu hale getirilir; ayrıca fare ile üzerine gelindiğinde
+  canlanan hizmet/ürün kartları ve birden fazla görseli sırayla tanıtan bir
+  katalog/portföy bölümü eklenir.
 
 **Anlaşılan Bedel:** [_______] TL + KDV
 

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "ARK site.config.json semasi",
-  "description": "B/A/S/S+ vitrin sitesi sablon motorunun okudugu tek config dosyasi (2026-07-19: eski 3D/7D tier isimleri degisti). Ajan 3 (site-assembler) bu dosyayi Kling + GSAP sablonuna gore derler.",
+  "description": "C/B/A/S/S+ vitrin sitesi sablon motorunun okudugu tek config dosyasi (2026-07-19: eski 3D/7D tier isimleri degisti; 2026-07-21: C tier + S/S+ icin gercek WebGL eklendi). Ajan 3 (site-assembler) bu dosyayi Kling + GSAP/WebGL sablonuna gore derler.",
   "type": "object",
   "required": ["site_id", "tier", "business", "sections", "seo", "deploy"],
   "properties": {
@@ -11,8 +11,8 @@
     },
     "tier": {
       "type": "string",
-      "enum": ["B", "A", "S", "S+"],
-      "description": "HER tier musterinin KENDI fotograflarini kullanir (media.customer_photos zorunlu) - jenerik/stok icerik YOK. Fark, o fotograflara ne kadar animasyon uygulandiginda: B (10-15bin TL): Kling video YOK, foto duz/statik + CSS Ken Burns. A (15-20bin TL): foto + KISA Kling-uretimi giris efekti (eski '3D' yerini aldi). S (20-25bin TL): fotograflardan TAM Kling image-to-video hero, scroll-scrub animasyon (eski '7D' yerini aldi). S+ (25-45bin TL): S'in ustune hover'da canlanan hizmet kartlari + pinned_story katalog bolumu + tum gecis efektleri - ARK'in kendi sitesine benzer ama kisisellestirilmis, hepsi WebGL'siz. (2026-07-19 itibariyla tier isimleri B/A/S/S+ olarak degistirildi - eski '3D'/'7D' adlari artik kullanilmiyor. Gercek Three.js/WebGL motoru HICBIR tier'de yok - kasitli olarak ERTELENDI, bkz README.md.)"
+      "enum": ["C", "B", "A", "S", "S+"],
+      "description": "HER tier musterinin KENDI fotograflarini kullanir (media.customer_photos zorunlu) - jenerik/stok icerik YOK. Motion-tech merdiveni (ucuzdan pahaliya, her tier bir oncekinin ustune TAM OLARAK bir teknoloji ekler): C (yeni, en ucuz): Kling/WebGL/GSAP YOK, onceden uretilmis sabit 'classic modern landing' sablon varyanti (design.landing_variant) + duz foto. B (10-15bin TL): Kling video YOK, foto duz/statik + CSS Ken Burns. A (15-20bin TL, 'eski kompozisyon'): foto + KISA Kling-uretimi giris efekti + GSAP/Canvas2D scroll-scrub (eski '3D' yerini aldi). S (20-25bin TL, YENI): sadece WebGL - hero.webgl_scene ile gercek Three.js sahnesi (ambient/autoplay), GSAP YOK, sections.animation_2 kullanilmaz. S+ (25-45bin TL, YENI): S'in WebGL sahnesi + GSAP ile koreografilenir (scroll'a baglanir), USTUNE animation_2 (Kling+GSAP) + hover'da canlanan hizmet kartlari + pinned_story katalog bolumu. (2026-07-19: tier isimleri B/A/S/S+ oldu. 2026-07-21: C tier eklendi, S/S+ icin guvenlik onlemleriyle - lazy-load, WebGL-yetkinlik tespiti, statik fallback, webglcontextlost kurtarma - gercek WebGL/Three.js eklendi; bkz README.md.)"
     },
     "business": {
       "type": "object",
@@ -35,7 +35,12 @@
         "primary_color": {"type": "string", "pattern": "^#[0-9a-fA-F]{6}$"},
         "secondary_color": {"type": "string", "pattern": "^#[0-9a-fA-F]{6}$"},
         "font_heading": {"type": "string"},
-        "font_body": {"type": "string"}
+        "font_body": {"type": "string"},
+        "landing_variant": {
+          "type": "string",
+          "enum": ["classic-01"],
+          "description": "SADECE C tier icin - onceden impeccable+ui-ux-pro-max ile uretilmis sabit sablon varyanti (src/layouts/). Yeni bir variant EKLEMEK kod degisikligi + yeni interaktif tasarim oturumu gerektirir, salt config duzenlemesi yetmez."
+        }
       }
     },
     "sections": {
@@ -46,13 +51,28 @@
         "hero": {
           "type": "object",
           "required": ["headline"],
-          "description": "A/S/S+ tier: video_asset+frame_count zorunlu (validate_config.py kontrol eder). B tier: 'image' zorunlu, video_asset/frame_count kullanilmaz.",
+          "description": "Tier'e gore hangi alanin zorunlu oldugu validate_config.py'da kontrol edilir. C/B tier: 'image' zorunlu. A tier: video_asset+frame_count zorunlu. S/S+ tier: webgl_scene zorunlu, video_asset kullanilmaz.",
           "properties": {
             "headline": {"type": "string"},
             "subheadline": {"type": "string"},
-            "video_asset": {"type": "string", "description": "Kling ciktisi frame-sequence klasoru/dosya yolu - A/S/S+ tier icin"},
+            "video_asset": {"type": "string", "description": "Kling ciktisi frame-sequence klasoru/dosya yolu - SADECE A tier icin"},
             "frame_count": {"type": "integer", "minimum": 1},
-            "image": {"type": "string", "description": "B tier icin: video yerine kullanilan tek statik hero fotografi"}
+            "image": {"type": "string", "description": "C/B tier icin: video/WebGL yerine kullanilan tek statik hero fotografi"},
+            "webgl_scene": {
+              "type": "object",
+              "description": "SADECE S/S+ tier icin gercek Three.js hero sahnesi (template/app/src/webgl-hero-scene.ts). Reduced-motion VEYA WebGL2 desteklenmiyor/context-lost durumunda fallback_image gosterilir.",
+              "required": ["preset", "fallback_image"],
+              "properties": {
+                "preset": {
+                  "type": "string",
+                  "enum": ["video-showcase", "chrome-ring"],
+                  "description": "video-showcase: musterinin GERCEK Kling image-to-video ciktisi 3D bir panelde parallax ile gosterilir (video_asset ZORUNLU) - S/S+'in ASIL musteri kullanimi. chrome-ring: musteri fotografi olmayan soyut/marka-ozel istisna (or. ARK'in kendi sitesi)."
+                },
+                "video_asset": {"type": "string", "description": "preset=video-showcase icin ZORUNLU - Kling image-to-video ciktisi .mp4 dosya yolu (kare cikarma GEREKMEZ, VideoTexture dogrudan kullanir)"},
+                "accent_color": {"type": "string", "pattern": "^#[0-9a-fA-F]{6}$", "description": "belirtilmezse design.secondary_color kullanilir"},
+                "fallback_image": {"type": "string", "description": "reduced-motion/WebGL2-yok/context-lost durumunda gosterilecek statik foto - ZORUNLU"}
+              }
+            }
           }
         },
         "services_grid": {
@@ -78,7 +98,7 @@
         },
         "animation_2": {
           "type": "object",
-          "description": "OPSIYONEL - B tier'de bu bolum hic yok (Kling videosu uretilmiyor). A/S/S+ tier'de video_asset+frame_count zorunlu (validate_config.py kontrol eder).",
+          "description": "OPSIYONEL - C/B/S tier'de bu bolum hic yok (S tier icin GSAP-yok ilkesi geregi KULLANILAMAZ, validate_config.py reddeder). A/S+ tier'de video_asset+frame_count zorunlu.",
           "required": ["video_asset", "frame_count"],
           "properties": {
             "video_asset": {"type": "string"},

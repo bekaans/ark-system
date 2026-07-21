@@ -31,14 +31,16 @@ body {
 }
 
 .ark-hero-frames,
-.ark-animation2-frames {
+.ark-animation2-frames,
+.ark-hero-webgl {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100vh;
 }
 
-.frame-sequence-canvas {
+.frame-sequence-canvas,
+.ark-hero-webgl-canvas {
   width: 100%;
   height: 100%;
   display: block;
@@ -300,7 +302,8 @@ body {
    scroll-scrubbing pinlemesi yerine tek bir statik kare goster. */
 @media (prefers-reduced-motion: reduce) {
   .ark-hero-frames,
-  .ark-animation2-frames {
+  .ark-animation2-frames,
+  .ark-hero-webgl {
     position: relative;
     height: 60vh;
   }
