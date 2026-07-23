@@ -122,6 +122,82 @@ NO_WORDS = ["hayır", "hayir", "yok", "iptal", "vazgeçtim", "vazgectim", "boşv
 CONFIRM_TIMEOUT_SECONDS = 12.0
 SLEEP_ACK = "Tamam, uyuyorum."
 
+# --- Misafir ses protokolu (2026-07-24, Kaan'in tanimi) ---
+# Kaan'in sesinden FARKLI bir ses Bexi'ye seslendiginde (ismini soyleyip
+# soru sordugunda): her yeni ses icin BIR kez asagidaki karsilama soylenir.
+# Kaan "sorun yok, konusabilirsin/tanisabilirsin" derse o misafirin sesi o
+# konusma icin 2. ses olarak kaydedilir (SADECE RAM - diske asla yazilmaz).
+# Konusma bitince (uyku) misafir sesleri silinir. Ayni durum tekrar
+# ederse Bexi sebebini aciklar (guvenlik + kendi sunucuya tasininca rahat
+# konusma sozu).
+GUEST_PROTOCOL = True
+# Ayni misafiri (bu konusma icinde) tekrar tanimak icin benzerlik esigi.
+GUEST_MATCH_THRESHOLD = 0.70
+GUEST_GREETING = (
+    "Seni tanımıyorum. Şu an gelişim aşamasında olduğum için seninle "
+    "konuşmak istenmeyen sonuçlara yol açabilir. Kaan, evet konuşabilirsin "
+    "diyecek kadar sana güveniyorsa, önce tanışır sonra konuşabiliriz."
+)
+GUEST_DELETED_EXPLANATION = (
+    "Herhangi bir güvenlik açığı olmasın diye misafir seslerini her "
+    "konuşma bitince siliyorum. Kendi veri sunucumuza geçtiğimizde daha "
+    "rahat konuşabileceğiz. Kaan yine onay verirse şimdi de tanışabiliriz."
+)
+GUEST_APPROVED_ACK = "Tamam, tanıştık. Artık konuşabilirsin."
+# Kaan'in onay kaliplari (kucuk harf, noktalamasiz metinde aranir)
+GUEST_APPROVE_PHRASES = [
+    "tanışabilirsin", "tanisabilirsin",
+    "konuşabilirsin", "konusabilirsin",
+    "sorun yok konuş", "sorun yok konus",
+    "konuşabilirsiniz", "konusabilirsiniz",
+]
+# Misafir ISIMLERI hatirlanir (SADECE isim - konusma icerigi/ses vektoru
+# DEGIL). Kaan'in kurali: "sadece isimlerini hatirla naber vb de ama
+# simdiden soyle ne konustugumuzu hatirlamiyorum, sebebi guvenlik."
+GUEST_NAMES_PATH = Path.home() / ".config" / "bexi" / "guest_names.json"
+GUEST_MEMORY_DISCLOSURE = (
+    "Bu arada şunu baştan söyleyeyim, ismini hatırlarım ama ne "
+    "konuştuğumuzu hatırlamam. Güvenlik gereği misafirlerle geçici "
+    "konuşuyorum, kendi veri sunucumuza geçince bu değişecek."
+)
+
+
+def load_guest_names() -> set[str]:
+    try:
+        return set(json.loads(GUEST_NAMES_PATH.read_text(encoding="utf-8")))
+    except (OSError, ValueError):
+        return set()
+
+
+def save_guest_names(names: set[str]) -> None:
+    try:
+        GUEST_NAMES_PATH.parent.mkdir(parents=True, exist_ok=True)
+        GUEST_NAMES_PATH.write_text(
+            json.dumps(sorted(names), ensure_ascii=False), encoding="utf-8"
+        )
+    except OSError:
+        pass
+
+
+_NAME_RE = re.compile(
+    r"\b(?:benim\s+)?(?:ad[iı]m|ismim)\s+([a-zçğıöşü]{2,20})\b",
+    re.IGNORECASE,
+)
+_NAME_STOPWORDS = {"ne", "yok", "var", "bir", "sen", "ben", "bu", "su", "şu"}
+
+
+def extract_guest_name(text: str) -> str | None:
+    """Misafirin kendini tanittigi ismi cikarir - SADECE net kaliplardan
+    ('adim X' / 'ismim X' / 'benim adim X'). 'ben X' gibi belirsiz kalip
+    KASITLI olarak desteklenmez (yanlis isim yakalamamak icin)."""
+    m = _NAME_RE.search(text)
+    if not m:
+        return None
+    name = m.group(1).strip().lower()
+    if name in _NAME_STOPWORDS:
+        return None
+    return name.capitalize()
+
 # --- Parmak şıklatma ile uyandırma ---
 # UYARI: bu akustik bir tahmin, wake word kadar güvenilir DEĞİL. Klavye
 # tıklaması, kapı çarpması, bardak sesi yanlış tetikleyebilir. Yanlış tetik
@@ -587,16 +663,22 @@ class SpeakerVerifier:
             np.zeros(SAMPLE_RATE * 2, dtype=np.float32) + 1e-4
         )
 
-    def score(self, audio_int16: np.ndarray) -> float | None:
-        """Benzerlik skoru (0-1). Ses çok kısaysa None döner."""
+    def embedding(self, audio_int16: np.ndarray) -> np.ndarray | None:
+        """Normalize edilmis ses vektoru. Ses cok kisaysa None doner.
+        Misafir ses protokolu icin de kullanilir - SADECE RAM'de yasar,
+        asla diske yazilmaz."""
         if len(audio_int16) < SAMPLE_RATE * SPEAKER_MIN_SECONDS:
             return None
         wav = audio_int16.astype(np.float32) / 32768.0
         emb = self.encoder.embed_utterance(wav)
-        return float(
-            np.dot(emb, self.reference)
-            / (np.linalg.norm(emb) * np.linalg.norm(self.reference))
-        )
+        return emb / np.linalg.norm(emb)
+
+    def score(self, audio_int16: np.ndarray) -> float | None:
+        """Benzerlik skoru (0-1). Ses çok kısaysa None döner."""
+        emb = self.embedding(audio_int16)
+        if emb is None:
+            return None
+        return float(np.dot(emb, self.reference))
 
     def is_owner(self, audio_int16: np.ndarray) -> tuple[bool, float | None]:
         s = self.score(audio_int16)
@@ -619,6 +701,28 @@ def _strip_wake(tokens: list[str]) -> list[str]:
         skip_next_verb = False
         out.append(t)
     return out
+
+
+def mentions_bexi(text: str) -> bool:
+    """Cumlenin HERHANGI bir yerinde Bexi'nin adi geciyor mu? (Misafir ses
+    protokolu icin - uyandirma kurali gibi 'ilk 2 kelime' kisiti YOK,
+    'ismini soyleyip soru sordugunda' tanimina uyar.)"""
+    return any(
+        _fuzzy_hit(t, WAKE_WORDS, WAKE_FUZZY_THRESHOLD) for t in text.split()
+    )
+
+
+def is_guest_approval(text: str) -> bool:
+    """Kaan'in 'sorun yok, konusabilirsin / tanisabilirsin' tarzi onayi."""
+    low = " ".join(t.strip(".,!?;:").lower() for t in text.split())
+    return any(p in low for p in GUEST_APPROVE_PHRASES)
+
+
+def guest_best_score(emb: np.ndarray, known: list[np.ndarray]) -> float:
+    """Bir ses vektorunun bilinen misafir vektorlerine en yuksek benzerligi."""
+    if not known:
+        return 0.0
+    return max(float(np.dot(emb, k)) for k in known)
 
 
 def is_forget_command(text: str) -> bool:
@@ -1077,6 +1181,67 @@ def main() -> None:
     last_interaction = 0.0
     last_topic: str | None = None  # "unut gitsin" için son konuşulan konu
 
+    # --- Misafir ses protokolu durumu ---
+    # SES vektorleri SADECE RAM (diske asla yazilmaz), konusma bitince silinir.
+    # Misafir ISIMLERI ise (SADECE isim, icerik degil) diskte kalici -
+    # Kaan'in kurali: "sadece isimlerini hatirla, naber de".
+    greeted_guests: list[np.ndarray] = []   # bu konusmada selamlanmis sesler
+    approved_guests: list[np.ndarray] = []  # Kaan onayli 2. sesler
+    pending_guest: np.ndarray | None = None  # son selamlanan, onay bekleyen
+    had_guest_before = False  # surec boyunca en az bir misafir onaylanip silindi mi
+    known_guest_names: set[str] = load_guest_names()
+
+    def remember_guest_name(text: str) -> None:
+        name = extract_guest_name(text)
+        if name and name not in known_guest_names:
+            known_guest_names.add(name)
+            save_guest_names(known_guest_names)
+            print(f"📝 Misafir ismi hatırlandı: {name} (sadece isim)")
+
+    def reset_guests() -> None:
+        """Konusma bitince (uyku) misafir SESLERINI sil - guvenlik geregi.
+        Isimler silinmez (Kaan: 'sadece isimlerini hatirla')."""
+        nonlocal pending_guest, had_guest_before
+        if approved_guests:
+            had_guest_before = True
+            print("🧹 Misafir sesleri silindi (konuşma bitti). İsimler kalıcı.")
+        greeted_guests.clear()
+        approved_guests.clear()
+        pending_guest = None
+
+    def handle_guest(audio: np.ndarray, text: str) -> None:
+        """Sahibi olmayan bir ses Bexi'ye seslendi - protokolu islet."""
+        nonlocal pending_guest
+        if not GUEST_PROTOCOL or verifier is None:
+            return
+        if not mentions_bexi(text):
+            return  # Bexi'ye seslenmemis - sessizce yok say (eski davranis)
+        emb = verifier.embedding(audio)
+        if emb is None:
+            return  # cok kisa, guvenilir vektor yok
+        if guest_best_score(emb, greeted_guests) >= GUEST_MATCH_THRESHOLD:
+            return  # bu sese bu konusmada zaten cevap verildi - 1 kez kurali
+        greeted_guests.append(emb)
+        pending_guest = emb
+
+        # Misafir kendini tanittiysa ismi hatirla + tanidik ismi sicak selamla
+        name = extract_guest_name(text)
+        if name:
+            returning = name in known_guest_names
+            remember_guest_name(text)
+        else:
+            returning = False
+
+        speaker.start_turn()
+        if returning:
+            # Tanidik isim: once sicak selam, sonra guvenlik acikligini baştan soyle
+            speaker.say(f"Naber {name}.")
+            speaker.say(GUEST_MEMORY_DISCLOSURE)
+        else:
+            speaker.say(GUEST_DELETED_EXPLANATION if had_guest_before else GUEST_GREETING)
+            speaker.say(GUEST_MEMORY_DISCLOSURE)
+        speaker.wait_until_done()
+
     try:
         while True:
             # ---------------- UYKU MODU ----------------
@@ -1101,12 +1266,19 @@ def main() -> None:
 
                 matched, remainder = match_wake_word(text)
                 if not matched:
-                    # Uyandırma kelimesi yok -> Claude'a HİÇ gitmiyor.
-                    print(f"   (yok sayıldı: {text})")
+                    # Uyandırma kelimesi yok. Ama sahibi olmayan biri Bexi'ye
+                    # ADIYLA seslendiyse (soru sorduysa) misafir protokolu -
+                    # yine de UYANMAZ, sadece sinir cumlesini soyler.
+                    if not is_owner and mentions_bexi(text):
+                        handle_guest(audio, text)
+                    else:
+                        print(f"   (yok sayıldı: {text})")
                     continue
 
                 if not is_owner:
-                    print(f"   🚫 farklı ses, yok sayıldı ({fmt_score(score)})")
+                    # 'Bexi uyan' dedi ama Kaan'in sesi degil -> misafir
+                    # protokolu, uyanmaz.
+                    handle_guest(audio, text)
                     continue
                 if score is not None:
                     print(f"   ✓ ses doğrulandı ({score:.3f})")
@@ -1131,6 +1303,7 @@ def main() -> None:
                 if remaining <= 0:
                     print("😴 Uzun süre sessizlik, uykuya dönüyorum.")
                     ui_emit("state", value="sleeping")
+                    reset_guests()
                     awake = False
                     continue
 
@@ -1140,6 +1313,7 @@ def main() -> None:
                 if audio is None:
                     print("😴 Uzun süre sessizlik, uykuya dönüyorum.")
                     ui_emit("state", value="sleeping")
+                    reset_guests()
                     awake = False
                     continue
                 if len(audio) < SAMPLE_RATE * 0.3:
@@ -1151,7 +1325,27 @@ def main() -> None:
                     continue
 
                 if not is_owner:
-                    print(f"   🚫 farklı ses, yok sayıldı ({fmt_score(score)})")
+                    # Kaan onayli 2. ses mi? (bu konusma icin gecici) -> izin
+                    emb_guest = verifier.embedding(audio) if verifier else None
+                    if emb_guest is not None and guest_best_score(
+                        emb_guest, approved_guests
+                    ) >= GUEST_MATCH_THRESHOLD:
+                        remember_guest_name(text)  # tanistiysa ismini hatirla
+                        # onayli misafir -> asagi ak, normal islensin
+                    else:
+                        # Onaysiz farkli ses -> Bexi'ye seslendiyse protokol
+                        handle_guest(audio, text)
+                        last_interaction = time.monotonic()
+                        continue
+                elif pending_guest is not None and is_guest_approval(text):
+                    # Kaan misafiri onayladi -> 2. ses olarak (RAM'de) kaydet
+                    approved_guests.append(pending_guest)
+                    pending_guest = None
+                    print("🤝 Misafir Kaan onayıyla kaydedildi (geçici).")
+                    speaker.start_turn()
+                    speaker.say(GUEST_APPROVED_ACK)
+                    speaker.wait_until_done()
+                    last_interaction = time.monotonic()
                     continue
 
                 # Unutma emri
@@ -1212,6 +1406,7 @@ def main() -> None:
                 if is_sleep_command(text):
                     print("😴 Uykuya geçiyorum.")
                     ui_emit("state", value="sleeping")
+                    reset_guests()
                     speaker.start_turn()
                     speaker.say(SLEEP_ACK, cached=cached_sleep_ack)
                     speaker.wait_until_done()
