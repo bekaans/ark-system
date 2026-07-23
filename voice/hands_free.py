@@ -94,9 +94,11 @@ WAKE_FUZZY_THRESHOLD = 0.92
 WAKE_MAX_TOKEN_INDEX = 2
 
 # Uykuya geçme fiili. Uyku emri SADECE uyandırma kelimesiyle birlikte
-# geçerli: "Bexi uyu". Böylece "şu dosyayı kapat" gibi gerçek komutlar
-# yanlışlıkla uyku emri sanılamaz.
-SLEEP_VERBS = ["uyu", "uyusana", "uyu"]
+# geçerli: "Bexi uyu" / "Bexi kapan". Böylece "şu dosyayı kapat" gibi
+# gerçek komutlar yanlışlıkla uyku emri sanılamaz (Kaan: "bexi uyu, kapan").
+# Not: "kapat" bilerek EKLENMEDI - "Bexi kapat şunu" gibi gerçek bir komutla
+# çakışırdı. "kapan" ise komut başında nadir, güvenli.
+SLEEP_VERBS = ["uyu", "uyusana", "kapan"]
 
 # Uyandıktan sonra bu kadar süre HİÇ konuşmazsan kendi uykuya döner.
 # Her konuşmanda sayaç sıfırlanır, yani sürekli sohbet ederken hiç kapanmaz.
@@ -199,9 +201,9 @@ def extract_guest_name(text: str) -> str | None:
     return name.capitalize()
 
 # --- Parmak şıklatma ile uyandırma ---
-# UYARI: bu akustik bir tahmin, wake word kadar güvenilir DEĞİL. Klavye
-# tıklaması, kapı çarpması, bardak sesi yanlış tetikleyebilir. Yanlış tetik
-# çok olursa SNAP_PEAK_THRESHOLD'u yükselt veya ENABLE_SNAP=False yap.
+# KAPALI ve KAPALI KALACAK (Kaan'ın kararı, 2026-07-24: "parmak şıklatma ile
+# uyanma falan yok, sadece 'Bexi uyan'"). Kod duruyor ama ENABLE_SNAP=False
+# olduğu sürece hiçbir şıklatma kod yolu çalışmaz. AÇMA.
 ENABLE_SNAP = False
 SNAP_PEAK_THRESHOLD = 0.35   # 0-1, tam ölçeğe göre tepe genlik
 SNAP_QUIET_BEFORE = 0.06     # şıklatmadan önceki sessizlik eşiği (RMS)
@@ -725,13 +727,31 @@ def guest_best_score(emb: np.ndarray, known: list[np.ndarray]) -> float:
     return max(float(np.dot(emb, k)) for k in known)
 
 
+# "bu konuyu komple unut" gibi TEK ANLAMLI, meta-unutma kaliplari. Bunlar
+# cumlenin herhangi yerinde gecerse yeter (uzunluk siniri yok) - cunku
+# "komple unut / konuyu unut" bir icerik komutu (orn "şu satırı unut") ile
+# karisamaz. Kaan'in ornegi: "Bexi bu konuyu komple unut".
+FORGET_STRONG_MARKERS = [
+    "komple unut", "konuyu unut", "bu konuyu unut", "bu konuyu komple unut",
+    "hepsini unut", "komple sil", "unut gitsin", "sil gitsin",
+    "boş ver gitsin", "bos ver gitsin",
+]
+
+
 def is_forget_command(text: str) -> bool:
-    """"unut gitsin" / "Bexi unut" gibi. Cümlenin TAMAMI unutma emri olmalı,
-    yoksa "şu satırı unut" gibi gerçek bir komut yanlış tetiklerdi."""
+    """Unutma emri mi? Iki yol:
+    1) Guclu, tek anlamli meta-isaret ("komple unut" vb) - cumlenin herhangi
+       yerinde gecerse yeter.
+    2) Kisa ve cumlenin TAMAMI unutma emri ("unut", "bunu unut") - "şu satırı
+       unut" gibi icerik komutlarini yanlis tetiklememek icin <=3 kelime siniri."""
     tokens = [t.strip(".,!?;:").lower() for t in text.split()]
     tokens = [t for t in tokens if t]
     core = " ".join(_strip_wake(tokens))
-    if not core or len(core.split()) > 3:
+    if not core:
+        return False
+    if any(m in core for m in FORGET_STRONG_MARKERS):
+        return True
+    if len(core.split()) > 3:
         return False
     return any(
         difflib.SequenceMatcher(None, core, ph).ratio() >= FORGET_FUZZY_THRESHOLD
