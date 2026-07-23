@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import difflib
 import json
+import os
 import queue
 import random
 import re
@@ -1146,7 +1147,16 @@ def main() -> None:
     verifier_box: dict = {}
     verifier_thread = None
 
-    if SPEAKER_VERIFY:
+    # Test modu: BEXI_SKIP_VERIFY=1 iken konusmaci dogrulama atlanir (enroll
+    # yapilmadan sesli test icin). Guvenli VARSAYILAN degismiyor - sadece bu
+    # env ile gecici olarak kapanir; misafir protokolu de dogrulayici None
+    # oldugu icin bu modda pasiftir.
+    verify_enabled = SPEAKER_VERIFY and os.getenv("BEXI_SKIP_VERIFY") != "1"
+    if SPEAKER_VERIFY and not verify_enabled:
+        print("[TEST MODU] BEXI_SKIP_VERIFY=1 -> konuşmacı doğrulama atlandı "
+              "(şimdilik herkes uyandırabilir, enroll sonrası kapat).")
+
+    if verify_enabled:
         # Dosya kontrolünü önden yap: yoksa 10 saniye bekleyip hata vermeyelim.
         if not VOICEPRINT_PATH.exists():
             sys.exit(
