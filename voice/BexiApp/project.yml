@@ -1,0 +1,35 @@
+# XcodeGen sablonu — iPhone hedefi icin .xcodeproj uretir.
+# Mac uygulamasi icin buna GEREK YOK (make_app.sh yeterli).
+#
+# Kullanim (Xcode kurulduktan sonra):
+#   brew install xcodegen
+#   cd voice/BexiApp && xcodegen
+#   open Bexi.xcodeproj   # Xcode'da: Signing & Capabilities -> kendi
+#                         # Apple ID'nle Team sec, iPhone'u bagla, Run.
+#
+# Apple gercegi: telefona kurulum icin imza sart. Bedava Apple ID ile
+# uygulama 7 gunde bir yeniden yuklenmeli; kalicisi Apple Developer
+# Program ($99/yil). Karar Kaan'in.
+name: Bexi
+options:
+  bundleIdPrefix: com.arkintelligencelabs
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  Bexi-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/Bexi
+    info:
+      path: iOS-Info.plist
+      properties:
+        CFBundleDisplayName: Bexi
+        UILaunchScreen: {}
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.arkintelligencelabs.bexi
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.9"

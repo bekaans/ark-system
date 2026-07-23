@@ -19,3 +19,6 @@ agents/remote-access/watchdog.log
 voice/venv/
 voice/__pycache__/
 template/app/public/assets/
+voice/BexiApp/.build/
+voice/BexiApp/Bexi.app/
+voice/BexiApp/Bexi.xcodeproj/

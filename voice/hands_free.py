@@ -166,6 +166,22 @@ FILLER_PHRASES = [
 # Bu süreyi geçen turlarda Claude'un ne yaptığı sesli anlatılmaya başlar.
 LONG_WAIT_THRESHOLD_SECONDS = 7.0
 
+# --- Bexi UI (Mac/iPhone uygulaması) ---
+# True ise ui_bridge.py'nin SSE sunucusu başlar; Mac/iOS Bexi uygulamaları
+# oradan canlı durum/konuşma akışı alır. False ise emit() no-op, motor
+# davranışı bit düzeyinde aynı kalır.
+UI_ENABLED = True
+
+try:
+    from ui_bridge import bridge as _ui_bridge
+except ImportError:
+    _ui_bridge = None
+
+
+def ui_emit(type_: str, **fields) -> None:
+    if UI_ENABLED and _ui_bridge is not None:
+        _ui_bridge.emit(type_, **fields)
+
 # Belli bir tur sayısından sonra Claude Code oturumunu sıfırlar.
 # 0 = hiç sıfırlama (VARSAYILAN).
 #
@@ -800,6 +816,8 @@ class Speaker:
         text = (text or "").strip()
         if not text or self._closed:
             return
+        if not is_filler:
+            ui_emit("bexi", text=text)  # dolgu cumleleri UI'da gosterilmez
         self._inc()
         self.text_q.put(SpeechItem(text=text, is_filler=is_filler, cached=cached))
 
@@ -832,6 +850,7 @@ class ActivityTracker:
         self.finished = False
 
     def set_activity(self, description: str) -> None:
+        ui_emit("tool", text=description)
         with self.lock:
             self.current_activity = description
 
@@ -882,6 +901,7 @@ def ask_claude_code_streaming(
 ) -> str:
     """Claude Code'u stream-json modunda çağırır; cümleler tamamlandıkça
     hemen seslendirir. Tam metni döndürür."""
+    ui_emit("state", value="thinking")
     cmd = [
         "claude", "-p", prompt,
         "--output-format", "stream-json",
@@ -951,6 +971,7 @@ def ask_claude_code_streaming(
 
             if not first_token_received:
                 first_token_received = True
+                ui_emit("state", value="speaking")
                 speaker.cancel_fillers()
                 tracker.mark_first_content()
 
@@ -1045,6 +1066,11 @@ def main() -> None:
     wake_hint = f"{WAKE_WORDS[0].capitalize()} uyan" if REQUIRE_WAKE_VERB else WAKE_WORDS[0].capitalize()
     print(f"Hazır. Uyandırmak için '{wake_hint}' de. Çıkmak için Ctrl+C.\n")
 
+    if UI_ENABLED and _ui_bridge is not None:
+        ui_url = _ui_bridge.start()
+        print(f"🖥️  Bexi uygulama köprüsü: {ui_url}\n")
+        ui_emit("state", value="sleeping")
+
     is_first_turn = True
     turn_count = 0
     awake = False
@@ -1059,6 +1085,7 @@ def main() -> None:
 
                 if kind == "snap":
                     print("👏 Şıklatma algılandı.")
+                    ui_emit("state", value="listening")
                     awake = True
                     last_interaction = time.monotonic()
                     speaker.start_turn()
@@ -1085,6 +1112,7 @@ def main() -> None:
                     print(f"   ✓ ses doğrulandı ({score:.3f})")
 
                 print(f"👂 Uyandım. ({text})")
+                ui_emit("state", value="listening")
                 awake = True
                 last_interaction = time.monotonic()
 
@@ -1102,6 +1130,7 @@ def main() -> None:
                 remaining = ACTIVE_WINDOW_SECONDS - (time.monotonic() - last_interaction)
                 if remaining <= 0:
                     print("😴 Uzun süre sessizlik, uykuya dönüyorum.")
+                    ui_emit("state", value="sleeping")
                     awake = False
                     continue
 
@@ -1110,6 +1139,7 @@ def main() -> None:
                 audio = record_until_silence(vad, timeout=remaining)
                 if audio is None:
                     print("😴 Uzun süre sessizlik, uykuya dönüyorum.")
+                    ui_emit("state", value="sleeping")
                     awake = False
                     continue
                 if len(audio) < SAMPLE_RATE * 0.3:
@@ -1181,6 +1211,7 @@ def main() -> None:
                 # Uyku emri ham metinde kontrol edilir ("Bexi uyu")
                 if is_sleep_command(text):
                     print("😴 Uykuya geçiyorum.")
+                    ui_emit("state", value="sleeping")
                     speaker.start_turn()
                     speaker.say(SLEEP_ACK, cached=cached_sleep_ack)
                     speaker.wait_until_done()
