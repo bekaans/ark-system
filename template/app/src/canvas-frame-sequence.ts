@@ -67,32 +67,65 @@ export function createCanvasFrameSequence(options: FrameSequenceOptions): {
     );
   }
 
+  // Kareler henuz agdan gelmemisken (lazy yukleme basladi ama bitmedi)
+  // gosterilen notr durum - dev-placeholder metni DEGIL, duz koyu zemin.
+  function drawLoading() {
+    if (!ctx) return;
+    ctx.fillStyle = "#1c1c1e";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
   function render() {
     if (!ctx) return;
     const i = Math.max(0, Math.min(frameCount - 1, Math.round(frameState.index)));
-    if (placeholderMode || !images[i] || !images[i].complete || images[i].naturalWidth === 0) {
+    if (placeholderMode) {
       drawPlaceholder(i);
+      return;
+    }
+    if (!images[i] || !images[i].complete || images[i].naturalWidth === 0) {
+      drawLoading();
       return;
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(images[i], 0, 0, canvas.width, canvas.height);
   }
 
-  // Kareleri onceden yukle. Herhangi biri 404 verirse (gercek Kling
-  // kareleri henuz uretilmediyse) placeholder moduna dus - sessizce cokme.
-  for (let i = 0; i < frameCount; i++) {
-    const img = new Image();
-    img.onload = () => {
-      loadedCount++;
-      if (i === frameState.index) render();
-    };
-    img.onerror = () => {
-      placeholderMode = true;
-      if (i === frameState.index) render();
-    };
-    img.src = frameUrl(i);
-    images.push(img);
+  // Kareleri yukle. Herhangi biri 404 verirse (gercek Kling kareleri henuz
+  // uretilmediyse) placeholder moduna dus - sessizce cokme.
+  let loadStarted = false;
+  function startLoading() {
+    if (loadStarted) return;
+    loadStarted = true;
+    for (let i = 0; i < frameCount; i++) {
+      const img = new Image();
+      img.onload = () => {
+        loadedCount++;
+        if (i === frameState.index) render();
+      };
+      img.onerror = () => {
+        placeholderMode = true;
+        if (i === frameState.index) render();
+      };
+      img.src = frameUrl(i);
+      images.push(img);
+    }
   }
+
+  // Yukleme, bolum gorunume 1 ekran mesafesine yaklasinca baslar - sayfa
+  // acilisinda ekran-alti bolumlerin (ornegin animation_2) onlarca/yuzlerce
+  // kare istegi acilis performansini (LCP) yemesin. Olculen gercek etki:
+  // S+ vitrininde acilista 120 gereksiz istek. Hero'da (sayfanin tepesi)
+  // observer aninda tetiklenir, oradaki davranis degismez.
+  const loadObserver = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        startLoading();
+        loadObserver.disconnect();
+      }
+    },
+    { rootMargin: "100% 0px" },
+  );
+  loadObserver.observe(container);
 
   // DESIGN.md "Do's and Don'ts": reduced-motion tercih eden ziyaretciye
   // scroll-scrubbing dayatma - tek bir statik (ortadaki) kare goster.
@@ -120,6 +153,7 @@ export function createCanvasFrameSequence(options: FrameSequenceOptions): {
 
   return {
     destroy() {
+      loadObserver.disconnect();
       trigger?.kill();
       window.removeEventListener("resize", resizeCanvas);
       canvas.remove();

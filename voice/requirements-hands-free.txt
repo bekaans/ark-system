@@ -1,0 +1,22 @@
+faster-whisper
+resemblyzer          # konuşmacı tanıma (SPEAKER_VERIFY)
+setuptools<81        # webrtcvad pkg_resources'a bağımlı, setuptools>=81'de kaldırıldı
+webrtcvad
+sounddevice
+numpy
+requests
+soundfile
+
+# TTS_ENGINE = "piper" (VARSAYILAN — lokal, Türkçe, en düşük gecikme)
+piper-tts
+# Ses modelini ayrıca indir:
+#   python -m piper.download_voices tr_TR-fettah-medium
+
+# TTS_ENGINE = "elevenlabs" (en doğal ses, ücretli, ağ gerekir)
+# elevenlabs
+
+# TTS_ENGINE = "edge" (ücretsiz, Türkçe, ağ gerekir)
+# edge-tts
+
+# TTS_ENGINE = "kokoro" (lokal ama Türkçe YOK)
+# kokoro-onnx

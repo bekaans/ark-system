@@ -16,3 +16,6 @@ agents/bexi-telegram/bridge.log
 agents/bexi-telegram/history.jsonl
 agents/bexi-telegram/digest.log
 agents/remote-access/watchdog.log
+voice/venv/
+voice/__pycache__/
+template/app/public/assets/
