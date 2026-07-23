@@ -59,7 +59,7 @@ hafızası) tanımlıyor. Bunlar henüz bu repoda yok, S0 bitince sırayla ele a
 | **dm-qualifier** | Türkçe WhatsApp/Instagram DM nitelendirme botu | Groq'un düşük gecikmesi gerçek zamanlı sohbet için kritik |
 | **Ajan 2** | Referans videodan Higgsfield/AI video prompt'u çıkarma (multimodal) | Gemini native video anlamada rakiplerinden belirgin önde |
 | **Ajan 3** | site-assembler: config → video → şablon → kalite kapısı → deploy orkestrasyonu | Gerçekten Claude Code üzerinden (headless) çalışan tek ajan — kod/araç kullanımı ağırlıklı |
-| **Bexi** | Kullanıcıya (sana) özet/soru-cevap/komut yönlendirme asistanı | Tek arayüz, WhatsApp + web chat (PWA), ayrı ajanlarla tek tek konuşma derdi yok |
+| **Bexi** | Kaan'ın konuştuğu dijital taraf — **ayrı bir ajan DEĞİL, Claude'un kendisi** (2026-07-24 netleşti): bu Claude Code oturumu, sesli arayüz (`voice/hands_free.py`, claude CLI'ı sarmalıyor) ve Mac/iPhone Bexi uygulaması aynı kimliğin kanalları | Kaan tüm ajanlarla tek tek konuşmak yerine tek kişiyle (Bexi'yle) konuşur; `agents/bexi-telegram/hourly_digest.py` Bexi'nin kendisi değil, sadece durum-raporu ileten alt botu ("durum botu") |
 
 `bexi-app/` klasörü Bexi'nin sohbet arayüzü (Next.js PWA) içindir — telefonda "Ana Ekrana Ekle" ile
 uygulama gibi çalışır, bilgisayardan tarayıcıdan erişilir. Henüz Supabase'e bağlanmadı (aşağıya bak).
