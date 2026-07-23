@@ -130,7 +130,15 @@ class UiBridge:
                 self.end_headers()
                 self.wfile.write(body)
 
-        self._server = ThreadingHTTPServer(("0.0.0.0", self.port), Handler)
+        class QuietServer(ThreadingHTTPServer):
+            daemon_threads = True
+
+            def handle_error(self, request, client_address):
+                # Istemci (telefon/uygulama) baglantiyi koparinca cikan
+                # ConnectionReset/BrokenPipe normaldir - traceback basma.
+                pass
+
+        self._server = QuietServer(("0.0.0.0", self.port), Handler)
         threading.Thread(target=self._server.serve_forever, daemon=True).start()
 
         lan_ip = _lan_ip()
