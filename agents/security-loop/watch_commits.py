@@ -125,13 +125,21 @@ def touched_agents(sha: str) -> str:
 
 
 def review_commit(sha: str) -> str:
-    out_file = Path(f"/tmp/security_loop_review_{sha}.txt")
+    return _run_codex_review(["--commit", sha], tag=sha)
+
+
+def review_uncommitted() -> str:
+    return _run_codex_review(["--uncommitted"], tag="uncommitted")
+
+
+def _run_codex_review(extra_args: list[str], tag: str) -> str:
+    out_file = Path(f"/tmp/security_loop_review_{tag}.txt")
     out_file.unlink(missing_ok=True)
     try:
         subprocess.run(
             [
                 "codex", "exec", "review",
-                "--commit", sha,
+                *extra_args,
                 "--output-last-message", str(out_file),
                 REVIEW_PROMPT,
             ],
@@ -142,6 +150,28 @@ def review_commit(sha: str) -> str:
     finally:
         out_file.unlink(missing_ok=True)
     return ""
+
+
+def manual_scan_now() -> str:
+    """Kaan Telegram'dan "tara" yazinca cagirilir (2026-07-24, elle tetikleme
+    talebi). Commit edilmemis degisiklik varsa onu, yoksa son commit'i tarar."""
+    status = subprocess.run(
+        ["git", "status", "--short"], cwd=ROOT, capture_output=True, text=True
+    ).stdout.strip()
+
+    if status:
+        review = review_uncommitted()
+        label = "Commit edilmemiş değişiklikler"
+    else:
+        sha = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
+        ).stdout.strip()
+        review = review_commit(sha)
+        label = f"Son commit ({sha[:7]})"
+
+    verdict = "SORUNLU" if is_problematic(review) else "temiz"
+    body = review if review else "(bos cevap - inceleme calismamis olabilir)"
+    return f"Güvenlik taraması - {label}\nSonuç: {verdict}\n\n{body[:1200]}"
 
 
 def is_problematic(review_text: str) -> bool:

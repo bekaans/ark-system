@@ -23,6 +23,11 @@ import urllib.request
 from pathlib import Path
 
 ARK_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Guvenlik taramasini elle tetiklemek icin (2026-07-24, Kaan'in talebi:
+# "tara" yazinca da calissin, sadece otomatik dongu degil).
+sys.path.insert(0, str(ARK_DIR / "agents" / "security-loop"))
+from watch_commits import manual_scan_now  # noqa: E402
 BRIDGE_DIR = ARK_DIR / "agents" / "bexi-telegram"
 OFFSET_FILE = BRIDGE_DIR / ".offset"
 HISTORY_FILE = BRIDGE_DIR / "history.jsonl"
@@ -238,6 +243,11 @@ def run() -> None:
                 # Hizli yol: diger ajanlarin (Ajan 1 + dm-qualifier) durumunu
                 # gercek Supabase verisiyle aninda raporla.
                 reply = generate_agent_status()
+            elif normalized in ("tara", "güvenlik tara", "guvenlik tara", "3"):
+                # Hizli yol: guvenlik dongusunu (agents/security-loop) elle
+                # tetikle - dakikalar surebilir (codex exec review), normal.
+                send_telegram("Taramaya başladım, birkaç dakika sürebilir...")
+                reply = manual_scan_now()
             else:
                 context = format_history(history[:-1])
                 prompt = (
