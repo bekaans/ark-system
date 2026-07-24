@@ -44,6 +44,7 @@ BATCH_SIZE = 3           # her calistirmada en fazla kac (sektor,sehir) cifti is
                          # her cift onlarca isletme detay sayfasi acabiliyor, CI'da
                          # yavas kalmasin diye kucuk tutuluyor ("acele degil, surekli")
 AUDIT_LIMIT = 15         # her calistirmada en fazla kac yeni site denetlensin
+CITY_RELEASE_BATCH = 5   # kuyruk bosalinca CITIES_EXPANSION'dan kac yeni sehir acilsin
 
 ALL_CITIES = CITIES + CITIES_EXPANSION
 
@@ -89,6 +90,32 @@ def seed_progress(supabase) -> None:
             rows[i : i + batch], on_conflict="sector_code,city"
         ).execute()
     print(f"[ARK] {len(rows)} (sektor,sehir) cifti tohumlandi ({len(CITIES)} sehir 'done', {len(CITIES_EXPANSION)} sehir 'pending').")
+
+
+def seed_next_tier(supabase) -> bool:
+    """Bekleyen cift kalmadiginda CITIES_EXPANSION'daki siradaki 5 ili (ticaret
+    hacmine gore sirali) 'pending' olarak acar. Daha once hic scrape_progress
+    kaydi olmayan ilk N sehri bulup ekler - zaten islenmis sehirlere dokunmaz.
+    Acacak yeni sehir kalmadiysa False doner (81 il de bitti demektir)."""
+    existing_cities = {
+        r["city"] for r in supabase.table("scrape_progress").select("city").execute().data
+    }
+    remaining = [c for c in CITIES_EXPANSION if c not in existing_cities]
+    if not remaining:
+        return False
+
+    next_cities = remaining[:CITY_RELEASE_BATCH]
+    rows = [
+        {"sector_code": code, "city": city, "status": "pending"}
+        for code in SECTOR_TERMS
+        for city in next_cities
+    ]
+    for i in range(0, len(rows), 200):
+        supabase.table("scrape_progress").upsert(
+            rows[i : i + 200], on_conflict="sector_code,city"
+        ).execute()
+    print(f"[ARK] Yeni kademe acildi: {', '.join(next_cities)} ({len(rows)} cift 'pending').")
+    return True
 
 
 def get_next_batch(supabase) -> list[dict]:
@@ -252,8 +279,12 @@ def main() -> None:
         seed_progress(supabase)
         batch = get_next_batch(supabase)
 
+        if not batch and seed_next_tier(supabase):
+            batch = get_next_batch(supabase)
+
         if not batch:
-            print("[ARK] Bekleyen (sektor,sehir) cifti yok - dongu bu calistirmada bosta gecti.")
+            print("[ARK] Bekleyen (sektor,sehir) cifti yok - 81 ilin tamami islendi, "
+                  "dongu bu calistirmada bosta gecti.")
             return
 
         print(f"[ARK] Bu calistirmada islenecek {len(batch)} cift: "

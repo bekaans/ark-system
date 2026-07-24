@@ -31,7 +31,27 @@ CITIES = ["Istanbul", "Ankara", "Izmir", "Bursa", "Antalya"]
 # s1-7 "surekli-calisan dongu" kapsaminda zaman icinde eklenecek yeni sehirler.
 # run_next_batch.py bunlari CITIES'e degil, ayri bir listeye koyar ki ilk 5
 # sehirle ilgili gecmis is (scrape_progress'te 'done') bozulmasin.
+# Sira TUIK GSYIH (il bazinda ekonomik buyukluk, ticaret hacmi vekili) sirasina
+# gore - 2026-07-24, Kaan'in talimatiyla 81 ilin tamami eklendi; run_next_batch.py
+# kuyruk bosaldikca bu listeden 5'erli kademeler halinde otomatik acar
+# (bkz. seed_next_tier), boylece kademe bitince elle mudahale gerekmez.
 CITIES_EXPANSION = [
+    # ilk kademe (2026-07-16'da eklendi, tamamlandi)
     "Adana", "Gaziantep", "Konya", "Mersin", "Kayseri",
     "Eskisehir", "Diyarbakir", "Samsun", "Denizli", "Sanliurfa",
+    # kalan 66 il, ticaret hacmine (GSYIH) gore sirali - 5'erli kademeler halinde acilir
+    "Kocaeli", "Manisa", "Tekirdag", "Hatay", "Balikesir",
+    "Sakarya", "Mugla", "Aydin", "Kahramanmaras", "Trabzon",
+    "Canakkale", "Afyonkarahisar", "Malatya", "Erzurum", "Sivas",
+    "Zonguldak", "Ordu", "Kutahya", "Mardin", "Van",
+    "Elazig", "Kirklareli", "Usak", "Corum", "Isparta",
+    "Edirne", "Duzce", "Osmaniye", "Tokat", "Bolu",
+    "Adiyaman", "Rize", "Aksaray", "Kastamonu", "Yalova",
+    "Batman", "Giresun", "Yozgat", "Bilecik", "Sirnak",
+    "Amasya", "Kirikkale", "Nigde", "Karaman", "Burdur",
+    "Nevsehir", "Karabuk", "Erzincan", "Agri", "Mus",
+    "Kirsehir", "Kars", "Siirt", "Bitlis", "Artvin",
+    "Bingol", "Cankiri", "Sinop", "Hakkari", "Bartin",
+    "Igdir", "Gumushane", "Kilis", "Tunceli", "Ardahan",
+    "Bayburt",
 ]

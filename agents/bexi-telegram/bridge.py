@@ -22,7 +22,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-ARK_DIR = Path.home() / "ark-system"
+ARK_DIR = Path(__file__).resolve().parent.parent.parent
 BRIDGE_DIR = ARK_DIR / "agents" / "bexi-telegram"
 OFFSET_FILE = BRIDGE_DIR / ".offset"
 HISTORY_FILE = BRIDGE_DIR / "history.jsonl"

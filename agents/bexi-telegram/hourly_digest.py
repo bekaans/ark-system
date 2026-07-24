@@ -19,7 +19,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-ARK_DIR = Path.home() / "ark-system"
+ARK_DIR = Path(__file__).resolve().parent.parent.parent
 INTERVAL_SECONDS = 3600
 
 
