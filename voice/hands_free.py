@@ -49,7 +49,10 @@ FRAME_SAMPLES = int(SAMPLE_RATE * FRAME_MS / 1000)
 # istersen 400-500'e çekebilirsin.
 SILENCE_TIMEOUT_MS = 1000
 VAD_AGGRESSIVENESS = 2
-WHISPER_MODEL_SIZE = "base"
+# "base" -> "small": base modeli "Bexi" gibi uydurma kelimeyi Turkce'de
+# tutarsiz yaziyordu (Beksi/Bekse/Bek suyan...). small cok daha isabetli;
+# biraz daha yavas ama wake-word icin sorun degil (~460MB, tek seferlik indirir).
+WHISPER_MODEL_SIZE = "small"
 
 # --- TTS motoru ---
 # "piper"      : LOKAL, Türkçe var, ağ gecikmesi sıfır. Düşük gecikme için
@@ -58,9 +61,12 @@ WHISPER_MODEL_SIZE = "base"
 #                   python -m piper.download_voices tr_TR-fettah-medium
 # "elevenlabs" : En doğal ses. flash modeli düşük gecikmeli ama ÜCRETLİ ve
 #                ağ gerektirir. ELEVENLABS_API_KEY ortam değişkeni lazım.
-# "edge"       : Ücretsiz, Türkçe var, ama ağ gerektirir (yavaş olabilir).
+# "edge"       : Ücretsiz, nöral ses, ağ gerektirir. VARSAYILAN (2026-07-24
+#                Kaan seçti - Piper robotikti). Ses: Giuseppe (İtalyan çok
+#                dilli, Türkçe'yi karakterli+doğru okuyor - "tabii"yi bile
+#                düzgün diyor, Ahmet uzatıyordu).
 # "kokoro"     : Lokal ve hızlı ama TÜRKÇE YOK — sadece İngilizce.
-TTS_ENGINE = "piper"
+TTS_ENGINE = "edge"
 
 PIPER_VOICE = "tr_TR-dfki-medium"  # fettah katalogdan kalkti (2026-07-23), tek Turkce ses bu
 PIPER_MODEL_PATH = f"~/.local/share/piper/{PIPER_VOICE}.onnx"
@@ -68,21 +74,45 @@ PIPER_MODEL_PATH = f"~/.local/share/piper/{PIPER_VOICE}.onnx"
 ELEVEN_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # kendi voice id'ini koy
 ELEVEN_MODEL = "eleven_flash_v2_5"  # en düşük gecikmeli çok dilli model
 
-EDGE_VOICE = "tr-TR-AhmetNeural"  # alternatif: tr-TR-EmelNeural
+# Bexi'nin sesi (Kaan'in secimi, 2026-07-24): canli, hafif genc/ergen ton,
+# kendine ozgu karakter. it-IT-Giuseppe cok dilli - Turkce'yi Ahmet'ten
+# cok daha iyi okuyor. rate/pitch canlilik+genclik icin ayarlandi.
+EDGE_VOICE = "it-IT-GiuseppeMultilingualNeural"
+EDGE_RATE = "+15%"   # canli/enerjik okuma hizi
+EDGE_PITCH = "+8Hz"  # hafif genc/ergen ton (bebek degil)
 
 KOKORO_VOICE = "af_heart"
 KOKORO_LANG = "en-us"
 
-# İlk cümleyi daha çabuk duymak için: ilk parça virgülde de bölünebilir.
-# Kısa metin = hızlı sentez = ilk ses daha erken. Sonraki cümleler zaten
-# arka planda sentezlendiği için onlarda gerek yok.
-FIRST_CHUNK_SPLIT_ON_COMMA = True
+# İlk cümleyi virgülden bölmek KAPALI (2026-07-24): parça parça okuma cümleyi
+# "devrik/kesik" gösteriyordu (Kaan: "devrik devrik okumasın, Türkçe gibi
+# okusun"). Edge nöral ses TAM cümleyle doğru tonlama yapıyor; sadece cümle
+# sonlarından böleriz, virgülden değil.
+FIRST_CHUNK_SPLIT_ON_COMMA = False
+
+# Telaffuz sözlüğü: Edge'in yanlış okuduğu kelimeleri sesletmeden ÖNCE doğru
+# okunan yazımıyla değiştirir (kelime bütünüyle eşleşir, büyük/küçük harf
+# duyarsız). Giuseppe "tabii"yi zaten doğru okuyor - liste şimdilik boş,
+# gerçek kullanımda yanlış çıkan kelime oldukça buraya eklenir.
+PRONUNCIATION_FIXES: dict[str, str] = {
+    # "ornek_yanlis": "dogru_okunan_yazim",
+}
 
 # --- Uyandırma (wake word) ---
 # Uyku modunda her duyduğu Claude'a GİTMEZ; sadece bu kelimelerden biri
 # geçerse uyanır. Whisper özel isimleri bozabildiği için ("Bexi" -> "beksi",
 # "peksi"...) bulanık eşleştirme yapıyoruz, varyantları da listeledim.
-WAKE_WORDS = ["bexi", "beksi", "peksi", "bexy", "bekси", "becksi", "beksy"]
+# Whisper "Bexi"yi tutarsiz yaziyor: Beksi / Bekse / Peksi / Begsi... Gozlemlenen
+# ve olasi varyantlarin hepsi burada (yenisini logdaki "yok sayildi: X" satirindan
+# ekle). Not: "bekse" 0.92 esikte "beksi"ye 0.8 benzedigi icin ACIK eklenmeli.
+WAKE_WORDS = [
+    "bexi", "beksi", "bekse", "bekse", "peksi", "pekse", "bexy", "bexe",
+    "beksy", "becksi", "begsi", "beğsi", "beksı", "pekse", "bekе",
+]
+# Whisper "Bexi"yi bazen bir sonraki kelimeye kaynatiyor ("Bek suyan"). Tam
+# kelime eslesmesi yetmiyor - bu kokler token icinde/bitisik ikilide aranir.
+# Hepsi Turkce'de gecmeyen harf dizileri, yanlis-pozitif riski dusuk.
+WAKE_STEMS = ("beks", "bekse", "bex", "peks", "pekse", "begs", "beğs")
 # Uyandırma fiili. True ise sadece "Bexi uyan" uyandırır, tek başına "Bexi"
 # uyandırmaz — yanlış tetiği ciddi biçimde azaltır.
 REQUIRE_WAKE_VERB = True
@@ -365,7 +395,9 @@ class EdgeBackend(TTSBackend):
         threading.Thread(target=self._loop.run_forever, daemon=True).start()
 
     async def _collect(self, text: str) -> bytes:
-        comm = self._edge_tts.Communicate(text, EDGE_VOICE)
+        comm = self._edge_tts.Communicate(
+            text, EDGE_VOICE, rate=EDGE_RATE, pitch=EDGE_PITCH
+        )
         buf = bytearray()
         async for chunk in comm.stream():
             if chunk["type"] == "audio":
@@ -484,7 +516,20 @@ def clean_for_speech(text: str) -> str:
     text = PATH_RE.sub(" dosya yolu ", text)
     text = MD_MARKS_RE.sub("", text)
     text = re.sub(r"\s+", " ", text)
+    text = _apply_pronunciation_fixes(text)
     return text.strip()
+
+
+def _apply_pronunciation_fixes(text: str) -> str:
+    """Yanlis okunan kelimeleri (PRONUNCIATION_FIXES) tam-kelime, buyuk/kucuk
+    harf duyarsiz olarak dogru okunan yazimla degistirir."""
+    if not PRONUNCIATION_FIXES:
+        return text
+    for wrong, right in PRONUNCIATION_FIXES.items():
+        text = re.sub(
+            rf"\b{re.escape(wrong)}\b", right, text, flags=re.IGNORECASE
+        )
+    return text
 
 
 # -------------------------------------------------------------------- kayıt
@@ -500,47 +545,98 @@ def _fuzzy_hit(word: str, candidates: list[str], threshold: float) -> bool:
     return False
 
 
+def _is_wake_token(tok: str) -> bool:
+    """Bu token Bexi'nin adi mi? Tam-varyant fuzzy VEYA kok (stem) icerimi."""
+    tok = tok.strip(".,!?;:").lower()
+    if not tok:
+        return False
+    return _fuzzy_hit(tok, WAKE_WORDS, WAKE_FUZZY_THRESHOLD) or any(
+        s in tok for s in WAKE_STEMS
+    )
+
+
+def _find_wake(tokens: list[str]) -> tuple[int, bool]:
+    """Uyanma kelimesini bul. Doner: (index, merged).
+    merged=True ise isim+fiil AYNI iki-token bloguna kaynamis
+    (Whisper 'Bexi uyan'i 'Bek suyan' diye bolebiliyor)."""
+    limit = min(len(tokens), WAKE_MAX_TOKEN_INDEX + 1)
+    for i in range(limit):
+        if _is_wake_token(tokens[i]):
+            return i, False
+    # bitisik ikili: "bek"+"suyan" -> "beksuyan" icinde "beks" var
+    for i in range(limit - 1):
+        blob = (tokens[i] + tokens[i + 1]).strip(".,!?;:").lower()
+        if any(s in blob for s in WAKE_STEMS):
+            return i, True
+    return -1, False
+
+
+def _is_verb_token(
+    tok: str, verbs: list[str], threshold: float = 0.7, substring: bool = True
+) -> bool:
+    """Fiil eslesmesi. substring=True iken kok token icinde geciyorsa da kabul
+    ('suyan' -> 'uyan'; Whisper kaynatmasina dayanikli). Uyku fiillerinde
+    substring=False + yuksek threshold: "kapat" (komut) ile "kapan" (uyku)
+    KARISMASIN."""
+    low = tok.strip(".,!?;:").lower()
+    if substring and any(v in low for v in verbs):
+        return True
+    return _fuzzy_hit(low, verbs, threshold)
+
+
 def match_wake_word(text: str) -> tuple[bool, str]:
     """Metinde uyandırma kelimesi var mı? Varsa (True, kalan komut) döner.
 
     'Bexi uyan, şu dosyayı oku' -> (True, 'şu dosyayı oku')
-    'Bexi'                      -> (True, '')
+    'Bek suyan saat kaç'        -> (True, 'saat kaç')   # Whisper kaynatmasi
     'hava nasıl'                -> (False, '')
     """
-    tokens = text.split()
-    for i, tok in enumerate(tokens):
-        if i > WAKE_MAX_TOKEN_INDEX:
-            break
-        if _fuzzy_hit(tok, WAKE_WORDS, WAKE_FUZZY_THRESHOLD):
-            rest = tokens[i + 1:]
-            # "Bexi uyan" gibi fiil şartı varsa, hemen ardından gelmeli
-            if REQUIRE_WAKE_VERB:
-                if not rest or not _fuzzy_hit(rest[0], WAKE_VERBS, 0.8):
-                    return False, ""
+    tokens = [t for t in text.split() if t.strip(".,!?;:")]
+    if not tokens:
+        return False, ""
+    low = [t.lower() for t in tokens]
+    idx, merged = _find_wake(tokens)
+    if idx == -1:
+        return False, ""
+
+    if merged:
+        blob = (low[idx] + low[idx + 1])
+        if REQUIRE_WAKE_VERB and not any(v in blob for v in WAKE_VERBS):
+            return False, ""
+        rest = tokens[idx + 2:]
+    else:
+        rest = tokens[idx + 1:]
+        if REQUIRE_WAKE_VERB:
+            if not rest or not _is_verb_token(rest[0], WAKE_VERBS):
+                return False, ""
+            rest = rest[1:]
+        else:
+            while rest and _is_verb_token(rest[0], WAKE_VERBS):
                 rest = rest[1:]
-            else:
-                while rest and _fuzzy_hit(rest[0], WAKE_VERBS, 0.8):
-                    rest = rest[1:]
-            return True, " ".join(rest).strip(" ,.")
-    return False, ""
+    return True, " ".join(rest).strip(" ,.")
 
 
 def is_sleep_command(text: str) -> bool:
-    """Sadece "Bexi uyu" kalıbı uykuya geçirir.
+    """Sadece "Bexi uyu" / "Bexi kapan" kalıbı uykuya geçirir.
 
     Uyandırma kelimesi şart olduğu için "şu dosyayı kapat" gibi gerçek
     komutlar asla uyku emri sanılamaz.
     """
-    tokens = [t.strip(".,!?;:").lower() for t in text.split()]
-    tokens = [t for t in tokens if t]
-
-    for i, tok in enumerate(tokens):
-        if i > WAKE_MAX_TOKEN_INDEX:
-            break
-        if _fuzzy_hit(tok, WAKE_WORDS, WAKE_FUZZY_THRESHOLD):
-            rest = tokens[i + 1:]
-            return bool(rest) and _fuzzy_hit(rest[0], SLEEP_VERBS, 0.85)
-    return False
+    tokens = [t for t in text.split() if t.strip(".,!?;:")]
+    if not tokens:
+        return False
+    idx, merged = _find_wake(tokens)
+    if idx == -1:
+        return False
+    low = [t.lower() for t in tokens]
+    if merged:
+        blob = (low[idx] + low[idx + 1])
+        return any(v in blob for v in SLEEP_VERBS)
+    rest = tokens[idx + 1:]
+    # Uyku fiilinde KATI eslesme: "kapat şunu" (komut) uyku sanilmasin.
+    return bool(rest) and _is_verb_token(
+        rest[0], SLEEP_VERBS, threshold=0.88, substring=False
+    )
 
 
 def _looks_like_snap(frames: list[np.ndarray], idx: int) -> bool:
@@ -695,10 +791,10 @@ def _strip_wake(tokens: list[str]) -> list[str]:
     out = []
     skip_next_verb = False
     for i, t in enumerate(tokens):
-        if i <= WAKE_MAX_TOKEN_INDEX and _fuzzy_hit(t, WAKE_WORDS, WAKE_FUZZY_THRESHOLD):
+        if i <= WAKE_MAX_TOKEN_INDEX and _is_wake_token(t):
             skip_next_verb = True
             continue
-        if skip_next_verb and _fuzzy_hit(t, WAKE_VERBS, 0.8):
+        if skip_next_verb and _is_verb_token(t, WAKE_VERBS):
             skip_next_verb = False
             continue
         skip_next_verb = False
@@ -710,9 +806,7 @@ def mentions_bexi(text: str) -> bool:
     """Cumlenin HERHANGI bir yerinde Bexi'nin adi geciyor mu? (Misafir ses
     protokolu icin - uyandirma kurali gibi 'ilk 2 kelime' kisiti YOK,
     'ismini soyleyip soru sordugunda' tanimina uyar.)"""
-    return any(
-        _fuzzy_hit(t, WAKE_WORDS, WAKE_FUZZY_THRESHOLD) for t in text.split()
-    )
+    return any(_is_wake_token(t) for t in text.split())
 
 
 def is_guest_approval(text: str) -> bool:
@@ -1020,12 +1114,64 @@ def long_wait_watchdog(tracker: ActivityTracker, speaker: Speaker) -> None:
 
 # -------------------------------------------------------------- claude çağrısı
 
+# Claude Code kotası dolunca (2026-07-24, Kaan'in talebi) OpenRouter uzerinden
+# DeepSeek'e gecebilmek icin: ayni OpenRouter hesabini (litellm/.env'deki
+# OPENROUTER_API_KEY) kullanan, sadece BU dosyaya ait, hicbir disaridan
+# arac (claudex/CCR - artik silindi) gerektirmeyen kucuk bir mekanizma.
+# CLAUDE_CONFIG_DIR BILEREK degistirilmiyor - ayni oturum/config kullanilir
+# ki "-c" ile konusma kesintisiz devam etsin.
+ROOT = Path(__file__).resolve().parent.parent
+DEEPSEEK_BASE_URL = "https://openrouter.ai/api"
+DEEPSEEK_MODEL = "deepseek/deepseek-v4-pro"
+DEEPSEEK_SMALL_MODEL = "nvidia/nemotron-nano-9b-v2:free"
+
+SWITCH_TO_DEEPSEEK_PHRASES = [
+    "deepseek'e geç", "deepseeke geç", "deepseek'e gec", "deepseeke gec",
+    "deepseek moduna geç", "deepseek moduna gec",
+]
+SWITCH_TO_CLAUDE_PHRASES = [
+    "claude'a dön", "claudeye dön", "claude'a don", "claudeye don",
+    "asıl modele dön", "asil modele don", "claude moduna dön", "claude moduna don",
+]
+
+
+def is_switch_to_deepseek_command(text: str) -> bool:
+    low = " ".join(t.strip(".,!?;:").lower() for t in text.split())
+    return any(p in low for p in SWITCH_TO_DEEPSEEK_PHRASES)
+
+
+def is_switch_to_claude_command(text: str) -> bool:
+    low = " ".join(t.strip(".,!?;:").lower() for t in text.split())
+    return any(p in low for p in SWITCH_TO_CLAUDE_PHRASES)
+
+
+def announce_provider_switch(speaker: "Speaker") -> None:
+    """Model gecisini kisa duyurur (2026-07-24, Kaan: uzun aciklama yerine
+    sesli soylenince yoruyor - sadece 'bir dakika...' + gectikten sonra
+    'tamam devam edebiliriz', elle/otomatik gecislerin hepsinde ayni)."""
+    speaker.say("Bir dakika...")
+    speaker.wait_until_done()
+    speaker.say("Tamam, devam edebiliriz.")
+    speaker.wait_until_done()
+
+
+def _read_openrouter_key() -> str:
+    env_path = ROOT / "litellm" / ".env"
+    for line in env_path.read_text().splitlines():
+        if line.startswith("OPENROUTER_API_KEY="):
+            return line.split("=", 1)[1].strip()
+    return ""
+
 
 def ask_claude_code_streaming(
-    prompt: str, is_first_turn: bool, speaker: Speaker
-) -> str:
+    prompt: str, is_first_turn: bool, speaker: Speaker, provider: str = "claude"
+) -> tuple[str, bool]:
     """Claude Code'u stream-json modunda çağırır; cümleler tamamlandıkça
-    hemen seslendirir. Tam metni döndürür."""
+    hemen seslendirir. (tam_metin, rate_limit_uyarisi_geldi_mi) döner.
+
+    provider="deepseek" ise ayni "claude" ikilisini OpenRouter'in Anthropic
+    uyumlu ucuna yonlendirip DeepSeek'i cevaplatir - CLAUDE_CONFIG_DIR ayni
+    kaldigi icin "-c" ile konusma gecmisi bozulmaz."""
     ui_emit("state", value="thinking")
     cmd = [
         "claude", "-p", prompt,
@@ -1036,8 +1182,18 @@ def ask_claude_code_streaming(
     if not is_first_turn:
         cmd.append("-c")
 
+    env = None
+    if provider == "deepseek":
+        env = os.environ.copy()
+        env["ANTHROPIC_BASE_URL"] = DEEPSEEK_BASE_URL
+        env["ANTHROPIC_MODEL"] = DEEPSEEK_MODEL
+        env["ANTHROPIC_SMALL_FAST_MODEL"] = DEEPSEEK_SMALL_MODEL
+        env["ANTHROPIC_AUTH_TOKEN"] = _read_openrouter_key()
+        env["ANTHROPIC_API_KEY"] = ""
+
     proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1,
+        env=env,
     )
 
     # stderr'i ayrı thread'de boşalt. Aksi halde Claude çok stderr yazarsa
@@ -1064,6 +1220,7 @@ def ask_claude_code_streaming(
     full_text_parts: list[str] = []
     first_token_received = False
     spoke_anything = False
+    rate_limit_hit = False
 
     try:
         assert proc.stdout is not None
@@ -1074,6 +1231,17 @@ def ask_claude_code_streaming(
             try:
                 event = json.loads(line)
             except json.JSONDecodeError:
+                continue
+
+            # Claude Code'un yerlesik rate_limit_event'i - kota "allowed"
+            # disina ciktiginda otomatik deepseek gecisini tetiklemek icin
+            # (2026-07-24, Kaan'in talebi). Tam esik semantigi resmi
+            # belgelenmedi - "allowed" disindaki her durum temkinli sekilde
+            # uyari sayilir.
+            if event.get("type") == "rate_limit_event":
+                info = event.get("rate_limit_info", {})
+                if info.get("status") not in (None, "allowed"):
+                    rate_limit_hit = True
                 continue
 
             if event.get("type") != "stream_event":
@@ -1126,14 +1294,15 @@ def ask_claude_code_streaming(
 
     if proc.returncode != 0:
         err = "".join(stderr_chunks).strip()
-        print(f"[hata] claude CLI (kod {proc.returncode}): {err}", file=sys.stderr)
+        print(f"[hata] claude CLI ({provider}, kod {proc.returncode}): {err}", file=sys.stderr)
         if not first_token_received:
-            speaker.say("Claude komutunda bir hata oldu, terminale bak.")
+            ad = "DeepSeek" if provider == "deepseek" else "Claude"
+            speaker.say(f"{ad} komutunda bir hata oldu, terminale bak.")
 
     if buffer.strip():
         speaker.say(clean_for_speech(buffer))
 
-    return "".join(full_text_parts).strip()
+    return "".join(full_text_parts).strip(), rate_limit_hit
 
 
 # ---------------------------------------------------------------------- main
@@ -1210,6 +1379,7 @@ def main() -> None:
     awake = False
     last_interaction = 0.0
     last_topic: str | None = None  # "unut gitsin" için son konuşulan konu
+    active_provider = "claude"  # "claude" | "deepseek" - elle/otomatik kota gecisi icin
 
     # --- Misafir ses protokolu durumu ---
     # SES vektorleri SADECE RAM (diske asla yazilmaz), konusma bitince silinir.
@@ -1378,6 +1548,23 @@ def main() -> None:
                     last_interaction = time.monotonic()
                     continue
 
+                # Model gecis emirleri - Claude'a hic gitmeden yerel olarak
+                # islenir (2026-07-24, Kaan'in talebi: elle deepseek'e gecis)
+                if is_switch_to_deepseek_command(text):
+                    active_provider = "deepseek"
+                    print("🔀 DeepSeek moduna geçildi (elle).")
+                    speaker.start_turn()
+                    announce_provider_switch(speaker)
+                    last_interaction = time.monotonic()
+                    continue
+                if is_switch_to_claude_command(text):
+                    active_provider = "claude"
+                    print("🔀 Claude moduna geçildi (elle).")
+                    speaker.start_turn()
+                    announce_provider_switch(speaker)
+                    last_interaction = time.monotonic()
+                    continue
+
                 # Unutma emri
                 if is_forget_command(text):
                     if not last_topic:
@@ -1422,13 +1609,17 @@ def main() -> None:
                     print("🧹 Unutma talimatı gönderiliyor...")
 
                     speaker.start_turn()
-                    response = ask_claude_code_streaming(
-                        text, is_first_turn, speaker
+                    response, rate_limit_hit = ask_claude_code_streaming(
+                        text, is_first_turn, speaker, active_provider
                     )
                     is_first_turn = False
                     turn_count += 1
                     print(f"🤖 Claude: {response}")
                     speaker.wait_until_done()
+                    if rate_limit_hit and active_provider == "claude":
+                        active_provider = "deepseek"
+                        print("🔀 Claude kotasi doluyor, DeepSeek'e geciliyor (otomatik).")
+                        announce_provider_switch(speaker)
                     last_interaction = time.monotonic()
                     continue
 
@@ -1465,13 +1656,19 @@ def main() -> None:
 
             last_topic = text  # "unut gitsin" bunu referans alacak
 
-            response = ask_claude_code_streaming(text, is_first_turn, speaker)
+            response, rate_limit_hit = ask_claude_code_streaming(
+                text, is_first_turn, speaker, active_provider
+            )
             is_first_turn = False
             turn_count += 1
             print(f"🤖 Claude: {response}")
 
             # Mikrofonu açmadan önce konuşma bitsin (yoksa kendi sesini kaydeder)
             speaker.wait_until_done()
+            if rate_limit_hit and active_provider == "claude":
+                active_provider = "deepseek"
+                print("🔀 Claude kotasi doluyor, DeepSeek'e geciliyor (otomatik).")
+                announce_provider_switch(speaker)
             last_interaction = time.monotonic()
 
     except KeyboardInterrupt:

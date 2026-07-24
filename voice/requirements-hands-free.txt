@@ -16,7 +16,7 @@ piper-tts
 # elevenlabs
 
 # TTS_ENGINE = "edge" (ücretsiz, Türkçe, ağ gerekir)
-# edge-tts
+edge-tts             # VARSAYILAN TTS (Giuseppe cok dilli nöral ses)
 
 # TTS_ENGINE = "kokoro" (lokal ama Türkçe YOK)
 # kokoro-onnx

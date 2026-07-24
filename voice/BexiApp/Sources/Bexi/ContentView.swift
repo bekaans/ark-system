@@ -136,6 +136,14 @@ struct ContentView: View {
             TextField("ör. 192.168.1.36", text: $app.host)
                 .textFieldStyle(.roundedBorder)
                 .autocorrectionDisabled()
+            Text("Token")
+                .font(.system(size: 13, weight: .semibold))
+            Text("Mac'te otomatik doldu. iPhone'da Mac'teki ~/.config/bexi/ui_token dosyasının içeriğini yapıştır.")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+            TextField("token", text: $app.token)
+                .textFieldStyle(.roundedBorder)
+                .autocorrectionDisabled()
             HStack {
                 Spacer()
                 Button("Bağlan") {

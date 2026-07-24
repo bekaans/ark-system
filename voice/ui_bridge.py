@@ -21,17 +21,37 @@ Olay şeması (her satır bir JSON):
 
 from __future__ import annotations
 
+import hmac
 import json
 import queue
+import secrets
 import socket
 import threading
 import time
+import urllib.parse
 from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 UI_DIR = Path(__file__).parent / "ui"
 HISTORY_LIMIT = 200  # yeni bağlanan istemciye gönderilecek geçmiş olay sayısı
+
+# Guvenlik: sunucu 0.0.0.0'da (tum LAN'a acik) dinliyor - token olmadan
+# ayni WiFi'daki HERKES konusmayi/is aktivitesini canli izleyebilirdi
+# (2026-07-24, Codex denetiminde bulundu). Kalici bir token dosyada tutulur
+# ki her yeniden baslatmada telefon/tarayici bookmark'i bozulmasin.
+UI_TOKEN_PATH = Path.home() / ".config" / "bexi" / "ui_token"
+
+
+def _get_or_create_ui_token() -> str:
+    if UI_TOKEN_PATH.exists():
+        token = UI_TOKEN_PATH.read_text().strip()
+        if token:
+            return token
+    token = secrets.token_urlsafe(24)
+    UI_TOKEN_PATH.parent.mkdir(parents=True, exist_ok=True)
+    UI_TOKEN_PATH.write_text(token)
+    return token
 
 _MIME = {
     ".html": "text/html; charset=utf-8",
@@ -78,13 +98,23 @@ class UiBridge:
     def start(self) -> str:
         """Sunucuyu arka plan thread'inde başlatır, erişim URL'ini döndürür."""
         bridge = self
+        token = _get_or_create_ui_token()
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *a):  # terminali kirletme
                 pass
 
+            def _authorized(self) -> bool:
+                qs = urllib.parse.urlparse(self.path).query
+                given = urllib.parse.parse_qs(qs).get("token", [""])[0]
+                return hmac.compare_digest(given, token)
+
             def do_GET(self):
-                if self.path == "/events":
+                if not self._authorized():
+                    self.send_response(403)
+                    self.end_headers()
+                    return
+                if self.path.split("?")[0] == "/events":
                     self._serve_sse()
                 else:
                     self._serve_static()

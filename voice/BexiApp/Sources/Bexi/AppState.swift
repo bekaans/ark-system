@@ -54,21 +54,37 @@ final class AppState: ObservableObject {
     @Published var host: String {
         didSet { UserDefaults.standard.set(host, forKey: "bexiHost") }
     }
+    // Motor artik token'siz baglantiyi reddediyor (2026-07-24, guvenlik -
+    // token yoksa ayni WiFi'daki herkes canli konusmayi izleyebiliyordu).
+    // Mac'te token dosyadan otomatik okunur; iPhone'da Ayarlar'dan elle
+    // yapistirilir (dosyaya erisimi yok, ayni host alani gibi).
+    @Published var token: String {
+        didSet { UserDefaults.standard.set(token, forKey: "bexiToken") }
+    }
 
     private var streamTask: Task<Void, Never>?
 
     init() {
         #if os(macOS)
         let defaultHost = "localhost"
+        let defaultToken = (try? String(
+            contentsOf: FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent(".config/bexi/ui_token"),
+            encoding: .utf8
+        ))?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         #else
         let defaultHost = ""
+        let defaultToken = ""
         #endif
         host = UserDefaults.standard.string(forKey: "bexiHost") ?? defaultHost
+        token = UserDefaults.standard.string(forKey: "bexiToken") ?? defaultToken
     }
 
     func connect() {
         streamTask?.cancel()
-        guard !host.isEmpty, let url = URL(string: "http://\(host):8123/events") else { return }
+        guard !host.isEmpty, !token.isEmpty,
+              let url = URL(string: "http://\(host):8123/events?token=\(token)")
+        else { return }
         streamTask = Task { [weak self] in
             var backoff: UInt64 = 1
             while !Task.isCancelled {

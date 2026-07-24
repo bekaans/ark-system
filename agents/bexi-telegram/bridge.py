@@ -209,9 +209,23 @@ def run() -> None:
         for update in results:
             offset = update["update_id"] + 1
             save_offset(offset)
-            text = update.get("message", {}).get("text", "")
+            message = update.get("message", {})
+            text = message.get("text", "")
             if not text:
                 continue
+
+            # Guvenlik: sadece Kaan'in kendi sohbetinden (CHAT_ID) gelen
+            # mesajlar islenir - aksi halde bot'un adini bilen herkes
+            # "dosya duzenle / git push" gibi komutlari calistirabilirdi
+            # (2026-07-24, Codex denetiminde bulundu).
+            sender_chat_id = str(message.get("chat", {}).get("id", ""))
+            if sender_chat_id != str(CHAT_ID):
+                print(
+                    f"[bexi-telegram] YETKISIZ mesaj reddedildi (chat_id={sender_chat_id}): {text}",
+                    flush=True,
+                )
+                continue
+
             print(f"[bexi-telegram] {time.ctime()} yeni mesaj: {text}", flush=True)
 
             history = append_history("user", text)
